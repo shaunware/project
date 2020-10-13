@@ -11,6 +11,7 @@ var usersRouter = require('./routes/users');
 var aboutRouter = require('./routes/about');
 /* ---------------------------- */
 
+var pageRouter = require('.routes/page');
 var app = express();
 
 // view engine setup
@@ -46,4 +47,5 @@ app.use(function(err, req, res, next) {
   res.render('error');
 });
 
+app.use('/page', pageRouter);
 module.exports = app;
