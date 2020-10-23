@@ -11,7 +11,11 @@ var usersRouter = require('./routes/users');
 var aboutRouter = require('./routes/about');
 /* ---------------------------- */
 
-var pageRouter = require('./routes/page');
+/* --- V3: Basic Template   --- */
+var tableRouter = require('./routes/table');
+var loopsRouter = require('./routes/loops');
+/* ---------------------------- */
+
 var app = express();
 
 // view engine setup
@@ -31,6 +35,11 @@ app.use('/users', usersRouter);
 app.use('/about', aboutRouter);
 /* ---------------------------- */
 
+/* --- V3: Basic Template   --- */
+app.use('/table', tableRouter);
+app.use('/loops', loopsRouter);
+/* ---------------------------- */
+
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
   next(createError(404));
@@ -47,5 +56,4 @@ app.use(function(err, req, res, next) {
   res.render('error');
 });
 
-app.use('/page', pageRouter);
 module.exports = app;
