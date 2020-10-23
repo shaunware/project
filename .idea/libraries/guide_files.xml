@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="guide_files">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/guide_files/guide_files.zip!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>
