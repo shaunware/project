@@ -11,7 +11,7 @@ var usersRouter = require('./routes/users');
 var aboutRouter = require('./routes/about');
 /* ---------------------------- */
 
-var pageRouter = require('.routes/page');
+var pageRouter = require('./routes/page');
 var app = express();
 
 // view engine setup
