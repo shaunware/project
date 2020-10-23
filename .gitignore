@@ -1,4 +1,4 @@
-App/.env
+App/*.env
 .idea/.gitignore
 .idea/misc.xml
 guide_app/App/public/images/
