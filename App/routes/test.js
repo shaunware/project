@@ -11,8 +11,6 @@ var sql_query = 'SELECT * FROM AppUsers';
 
 router.get('/', function(req, res, next) {
 	pool.query(sql_query, (err, data) => {
-		console.log(err);
-		console.log(data);
 		res.render('test', { title: 'Database Connect', data: data.rows });
 	});
 });

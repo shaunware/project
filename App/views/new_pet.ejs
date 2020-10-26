@@ -18,7 +18,7 @@
   </head>
   <body>
     <h1><%= title%></h1>
-		<form id="html_form" action="insert" role="form" method="post">
+		<form id="html_form" action="new_pet" role="form" method="post">
 			<div class="form-group">
 				<label for="petid">Pet ID</label>
 				<input type="text" class="form-control" id="petid" name="petid" aria-describedby="petidHelp" placeholder="Enter your pet ID">
@@ -38,7 +38,7 @@
 			</div>
 			<button type="submit" class="btn btn-primary">Submit</button>
 		</form>
-		
+
 		<script>
 			(function() {
 				window.addEventListener('load', function() {
