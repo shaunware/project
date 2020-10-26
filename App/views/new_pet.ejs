@@ -2,7 +2,7 @@
 <html>
   <head>
 		<!-- Page Title -->
-    <title>CS2102 Modifying Database</title>
+    <title><%= title%></title>
     <link rel='stylesheet' href='/stylesheets/style.css' />
 		
 		<!-- CSS for Styling -->
@@ -14,10 +14,10 @@
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/js/bootstrap.min.js" integrity="sha384-B0UglyR+jN6CkvvICOB2joaf5I4l3gm9GU6Hc1og6Ls7i6U/mkkaduKaBhlAXv9k" crossorigin="anonymous"></script>
 
 		<!-- ADDED JavaScript -->
-		<script src="javascripts/insertScript.js"></script>
+		<script src="javascripts/petInsertScript.js"></script>
   </head>
   <body>
-    <h1>CS2102: <%= title%></h1>
+    <h1><%= title%></h1>
 		<form id="html_form" action="insert" role="form" method="post">
 			<div class="form-group">
 				<label for="petid">Pet ID</label>

@@ -10,22 +10,23 @@ var sql_query = 'INSERT INTO Pets VALUES';
 
 // GET
 router.get('/', function(req, res, next) {
-	res.render('insert', { title: 'Modifying Database' });
+	res.render('new_pet', { title: 'Add New Pet' });
 });
 
 // POST
 router.post('/', function(req, res, next) {
 	// Retrieve Information
-	var matric  = req.body.matric;
+	var petid  = req.body['petid'];
 	var name    = req.body.name;
-	var faculty = req.body.faculty;
+	var category = req.body.category;
+	var requirement = req.body.requirements;
 	
 	// Construct Specific SQL Query
-	var insert_query = sql_query + "('" + matric + "','" + name + "','" + faculty + "')";
+	var insert_query = sql_query + "('" + petid + "','" + name + "','" + category + "','" + requirement + "')";
 	
-	pool.query(insert_query, (err, data) => {
-		res.redirect('/select')
-	});
+	//pool.query(insert_query, (err, data) => {
+	//	res.redirect('/select')
+	//});
 });
 
 module.exports = router;
