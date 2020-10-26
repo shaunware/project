@@ -7,7 +7,7 @@ const pool = new Pool({connectionString:process.env.DATABASE_URL})
 
 /* SQL Query */
 var all_pets_query = 'SELECT petid FROM Pets';
-var all_categories_query = 'SELECT * FROM PetCategories';
+var all_categories_query = 'SELECT * FROM PetCategories ORDER BY name';
 var sql_query = 'INSERT INTO Pets VALUES ';
 
 /* Data */
@@ -22,7 +22,7 @@ router.get('/:userid', function(req, res, next) {
 	pool.query(all_categories_query, (err, data) => {
 		categories = data.rows;
 	})
-	res.render('new_pet', { title: 'Database Connect', pets: pets, categories: categories, userid: req.params.userid});
+	res.render('new_pet', { title: 'Add New Pet', pets: pets, categories: categories, userid: req.params.userid});
 });
 
 // POST
