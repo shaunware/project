@@ -13,41 +13,56 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.6/umd/popper.min.js" integrity="sha384-wHAiFfRlMFy6i5SRaxvfOCifBUQy1xHdJ/yoi7FRNXMRBu5WHdZYu1hA6ZOblgut" crossorigin="anonymous"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/js/bootstrap.min.js" integrity="sha384-B0UglyR+jN6CkvvICOB2joaf5I4l3gm9GU6Hc1og6Ls7i6U/mkkaduKaBhlAXv9k" crossorigin="anonymous"></script>
 
+	  <script>
+		  const toggle = () => {
+		  	let t = document.getElementById("new-category");
+			let b = document.getElementById("new-category-btn");
+		  	if (t.style.display === "none") {
+		  		t.style.display = "block";
+				b.innerText = "Cancel";
+			} else {
+		  		t.style.display = "none";
+				b.innerText = "New Category";
+			}
+		  };
+	  </script>
   </head>
   <body>
     <h1><%= title%></h1>
-		<form id="html_form" action=<%= userid%> role="form" method="post">
-			<div class="form-group">
-				<label for="petid">Pet ID</label>
-				<input type="text" class="form-control" id="petid" name="petid" aria-describedby="petidHelp" placeholder="Enter your pet ID" value=<%= petid%> >
-				<% if (petidErr !== "") { %>
-					<small id="petidErr" class="err"><%= petidErr %></small>
+	<form id="html_form" action=<%= userid%> role="form" method="post">
+		<div class="form-group">
+			<label for="petid">Pet ID</label>
+			<input type="text" class="form-control" id="petid" name="petid" aria-describedby="petidHelp" placeholder="Enter your pet ID" value=<%= petid%> >
+			<% if (petidErr !== "") { %>
+				<small id="petidErr" class="err"><%= petidErr %></small>
+			<% } %>
+			<small id="petidHelp" class="form-text text-muted">Do not share your Pet ID with anyone else.</small>
+		</div>
+		<div class="form-group">
+			<label for="name">Name</label>
+			<input type="text" class="form-control" id="name" name="name" placeholder="Enter your pet's name" value=<%= name%> >
+			<% if (nameErr !== "") { %>
+				<small id="nameErr" class="err"><%= nameErr %></small>
+			<% } %>
+		</div>
+		<div class="form-group">
+			<label for="category">Category</label>
+			<% var temp = 1;%>
+			<button type="button" class="add-button form-control" id="new-category-btn" name="new-category" onclick="toggle()">New Category</button>
+			<input id="new-category" type="text" name="mew-category" class="form-control" style="display: none;">
+			<select class="form-control" id="category" name="category">
+				<% for(var i=0; i<categories.length; i++) { %>
+					<% var selected = categories[i].name === category ? 'selected' : ''; %>
+					<option value="<%= categories[i].name%>%>" <%= selected%> ><%= categories[i].name %></option>
 				<% } %>
-				<small id="petidHelp" class="form-text text-muted">Do not share your Pet ID with anyone else.</small>
-			</div>
-			<div class="form-group">
-				<label for="name">Name</label>
-				<input type="text" class="form-control" id="name" name="name" placeholder="Enter your pet's name" value=<%= name%> >
-				<% if (nameErr !== "") { %>
-					<small id="nameErr" class="err"><%= nameErr %></small>
-				<% } %>
-			</div>
-			<div class="form-group">
-				<label for="category">Category</label>
-				<button type="button" class="add-button form-control" id="new-category" name="new-category" >New Category</button>
-				<select class="form-control" id="category" name="category">
-					<% for(var i=0; i<categories.length; i++) { %>
-						<% var selected = categories[i].name === category ? 'selected' : ''; %>
-						<option value="<%= categories[i].name%>%>" <%= selected%> ><%= categories[i].name %></option>
-					<% } %>
-				</select>
-			</div>
-			<div class="form-group">
-				<label for="requirements">Special Requirements</label>
-				<textarea class="form-control" id="requirements" name="requirements" placeholder="Enter special requirements for taking care of your pet"><%= requirements%></textarea>
-			</div>
-			<button type="submit" class="btn btn-primary">Submit</button>
-		</form>
-
+			</select>
+		</div>
+		<div class="form-group">
+			<label for="requirements">Special Requirements</label>
+			<textarea class="form-control" id="requirements" name="requirements" placeholder="Enter special requirements for taking care of your pet"><%= requirements%></textarea>
+		</div>
+		<button type="submit" class="btn btn-primary">Submit</button>
+		<p>c: <%= categories[0].name %></p>
+	</form>
   </body>
 </html>
