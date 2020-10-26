@@ -74,11 +74,9 @@ router.post('/:userid', function(req, res, next) {
 	if (petidErr === "" && nameErr === "") {
 		// Construct Specific SQL Query
 		var insert_query = sql_query + "('" + petid + "','" + name + "','" + category + "','" + owner + "','" + requirements + "')";
-		console.log(insert_query);
 
 		pool.query(insert_query, (err, data) => {
-			console.log(err);
-			res.redirect('/test');
+			res.redirect('/test'); //TODO: Need to update
 		});
 	} else {
 		res.render('new_pet', { title: 'Add New Pet', categories: categories,
