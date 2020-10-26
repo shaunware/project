@@ -8,16 +8,17 @@ const pool = new Pool({connectionString:process.env.DATABASE_URL})
 /* SQL Query */
 var all_pets_query = 'SELECT petid FROM Pets';
 var all_categories_query = 'SELECT * FROM PetCategories';
-var select_query = 'SELECT petid, PetCategories.name FROM Pets, PetCategories WHERE owner = $1';
-var sql_query = 'INSERT INTO Pets VALUES';
+var sql_query = 'INSERT INTO Pets VALUES ';
+
+/* Data */
+var pets;
+var categories;
 
 // GET
 router.get('/:userid', function(req, res, next) {
-	var pets;
 	pool.query(all_pets_query, (err, data) => {
 		pets = data.rows;
 	})
-	var categories;
 	pool.query(all_categories_query, (err, data) => {
 		categories = data.rows;
 	})
@@ -27,12 +28,12 @@ router.get('/:userid', function(req, res, next) {
 // POST
 router.post('/:userid', function(req, res, next) {
 	// Retrieve Information
-	var petid  = req.body['petid'];
+	var petid  = req.body.petid;
 	var name    = req.body.name;
 	var category = req.body.category;
 	var owner = req.params.userid;
 	var requirement = req.body.requirements;
-	
+
 	// Construct Specific SQL Query
 	var insert_query = sql_query + "('" + petid + "','" + name + "','" + category + "','" + owner + "','" + requirement + "')";
 	

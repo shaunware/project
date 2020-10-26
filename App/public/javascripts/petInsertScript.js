@@ -4,6 +4,7 @@ function check(event) {
 	//var name    = document.getElementById('name'   ).value;
 	//var category = document.getElementById('category').value;
 	//var requirements = document.getElementById('requirements').value;
+	alert(petid + "this");
 	if (petid.length < 3) {
 		alert("Invalid matric number");
 		event.preventDefault();
