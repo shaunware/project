@@ -18,7 +18,7 @@
   </head>
   <body>
     <h1><%= title%></h1>
-		<form id="html_form" action="petInsert" role="form" method="post">
+		<form id="html_form" action=<%= userid%> role="form" method="post">
 			<div class="form-group">
 				<label for="petid">Pet ID</label>
 				<input type="text" class="form-control" id="petid" name="petid" aria-describedby="petidHelp" placeholder="Enter your pet ID" value=<%= petid%> >
@@ -39,7 +39,7 @@
 				<select class="form-control" id="category" name="category">
 					<% for(var i=0; i<categories.length; i++) { %>
 						<% var selected = categories[i].name === category ? 'selected' : ''; %>
-						<option value="<%= categories[i].name %> %>" <%= selected%> ><%= categories[i].name %></option>
+						<option value="<%= categories[i].name%>%>" <%= selected%> ><%= categories[i].name %></option>
 					<% } %>
 				</select>
 			</div>

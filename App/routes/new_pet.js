@@ -26,7 +26,7 @@ router.get('/:userid', function(req, res, next) {
 	pool.query(all_categories_query, (err, data) => {
 		categories = data.rows;
 	})
-	res.render('new_pet', { title: 'Add New Pet', categories: categories, petid: "", petidErr: "", name: "", nameErr: "", category: "", requirements: "" });
+	res.render('new_pet', { title: 'Add New Pet', categories: categories, petid: "", petidErr: "", name: "", nameErr: "", category: "", requirements: "", userid: req.params.userid });
 });
 
 // POST
@@ -40,7 +40,7 @@ router.post('/:userid', function(req, res, next) {
 
 	// Validation
 	var found_petid;
-	for (var i=0; i<pets.length - 1; i++) {
+	for (var i=0; i<pets.length; i++) {
 		if (petid === pets[i].petid) {
 			found_petid = true;
 			break;
@@ -74,13 +74,15 @@ router.post('/:userid', function(req, res, next) {
 	if (petidErr === "" && nameErr === "") {
 		// Construct Specific SQL Query
 		var insert_query = sql_query + "('" + petid + "','" + name + "','" + category + "','" + owner + "','" + requirements + "')";
+		console.log(insert_query);
 
 		pool.query(insert_query, (err, data) => {
-			res.redirect('/test')
+			console.log(err);
+			res.redirect('/test');
 		});
 	} else {
 		res.render('new_pet', { title: 'Add New Pet', categories: categories,
-			petid: petid, petidErr: petidErr, name: name, nameErr: nameErr, category: category, requirements: requirements });
+			petid: petid, petidErr: petidErr, name: name, nameErr: nameErr, category: category, requirements: requirements, userid: req.params.userid });
 	}
 });
 
