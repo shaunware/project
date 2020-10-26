@@ -10,3 +10,8 @@ a {
 .err {
   color: red;
 }
+
+#new-category {
+  width: 20%;
+  display: inline-block;
+}
