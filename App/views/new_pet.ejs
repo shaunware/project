@@ -21,25 +21,31 @@
 		<form id="html_form" action="petInsert" role="form" method="post">
 			<div class="form-group">
 				<label for="petid">Pet ID</label>
-				<input type="text" class="form-control" id="petid" name="petid" aria-describedby="petidHelp" placeholder="Enter your pet ID">
-				<small id="petidErr" class="err">This is an error message</small>
+				<input type="text" class="form-control" id="petid" name="petid" aria-describedby="petidHelp" placeholder="Enter your pet ID" value=<%= petid%> >
+				<% if (petidErr !== "") { %>
+					<small id="petidErr" class="err"><%= petidErr %></small>
+				<% } %>
 				<small id="petidHelp" class="form-text text-muted">Do not share your Pet ID with anyone else.</small>
 			</div>
 			<div class="form-group">
 				<label for="name">Name</label>
-				<input type="text" class="form-control" id="name" name="name" placeholder="Enter your pet's name">
+				<input type="text" class="form-control" id="name" name="name" placeholder="Enter your pet's name" value=<%= name%> >
+				<% if (nameErr !== "") { %>
+					<small id="nameErr" class="err"><%= nameErr %></small>
+				<% } %>
 			</div>
 			<div class="form-group">
 				<label for="category">Category</label>
 				<select class="form-control" id="category" name="category">
 					<% for(var i=0; i<categories.length; i++) { %>
-						<option value="<%= categories[i].name %> %>"><%= categories[i].name %></option>
+						<% var selected = categories[i].name === category ? 'selected' : ''; %>
+						<option value="<%= categories[i].name %> %>" <%= selected%> ><%= categories[i].name %></option>
 					<% } %>
 				</select>
 			</div>
 			<div class="form-group">
 				<label for="requirements">Special Requirements</label>
-				<input type="text" class="form-control" id="requirements" name="requirements" placeholder="Enter special requirements for taking care of your pet">
+				<textarea class="form-control" id="requirements" name="requirements" placeholder="Enter special requirements for taking care of your pet"><%= requirements%></textarea>
 			</div>
 			<button type="submit" class="btn btn-primary">Submit</button>
 		</form>
