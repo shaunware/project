@@ -37,6 +37,7 @@ router.post('/:userid', function(req, res, next) {
 	var category = req.body.category;
 	var owner = req.params.userid;
 	var requirements = req.body.requirements;
+	console.log("HERE: " + req.body.newCategory);
 
 	// Validation
 	var found_petid;

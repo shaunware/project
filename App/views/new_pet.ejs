@@ -15,7 +15,7 @@
 
 	  <script>
 		  const toggle = () => {
-		  	let t = document.getElementById("new-category");
+		  	let t = document.getElementById("newCategory");
 			let b = document.getElementById("new-category-btn");
 		  	if (t.style.display === "none") {
 		  		t.style.display = "block";
@@ -49,7 +49,7 @@
 			<label for="category">Category</label>
 			<% var temp = 1;%>
 			<button type="button" class="add-button form-control" id="new-category-btn" name="new-category" onclick="toggle()">New Category</button>
-			<input id="new-category" type="text" name="mew-category" class="form-control" style="display: none;">
+			<input type="text" class="form-control" id="newCategory" name="newCategory" placeholder="Enter new category name" value="<%= category%>" style="display: none;">
 			<select class="form-control" id="category" name="category">
 				<% for(var i=0; i<categories.length; i++) { %>
 					<% var selected = categories[i].name === category ? 'selected' : ''; %>
