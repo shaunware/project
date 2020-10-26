@@ -6,7 +6,7 @@ const { Pool } = require('pg')
 const pool = new Pool({connectionString:process.env.DATABASE_URL})
 
 /* SQL Query */
-var sql_query = 'INSERT INTO student_info VALUES';
+var sql_query = 'INSERT INTO Pets VALUES';
 
 // GET
 router.get('/', function(req, res, next) {
