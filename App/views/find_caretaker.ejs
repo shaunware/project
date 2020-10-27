@@ -29,7 +29,14 @@
 			<label for="e_date">End Date</label>
 			<input type="text" class="form-control" id="e_date" name="e_date" placeholder="yyyy-mm-dd" value=<%= e_date%> >
 			<button type="submit" class="btn btn-primary">Find care takers</button>
-		</div>
+			<br />
+			<% if (sDateErr !== "") { %>
+				<small id="sDateErr" class="err"><%= sDateErr%></small>
+			<% } %>
+			<br />
+			<% if (eDateErr !== "") { %>
+				<small id="eDateErr" class="err"><%= eDateErr%></small>
+			<% } %></div>
 		<button type="button" class="btn btn-secondary" id="filter-btn" name="filter-btn">Filter for care takers</button>
 		<br /><br />
 		<table id="caretakers" class="table">

@@ -83,8 +83,8 @@ var compareDates = (d1, d2) => {
 var connectionSuccess;
 var isPetOwner;
 var isValidPet;
-var sDateErr;
-var eDateErr;
+var sDateErr = "";
+var eDateErr = "";
 
 // GET
 router.get('/:userid/:petid', function(req, res, next) {
@@ -123,7 +123,9 @@ router.get('/:userid/:petid', function(req, res, next) {
 					requirements: requirements,
 					careTakers: careTakers,
 					s_date: getString(s_date),
-					e_date: getString(e_date)
+					e_date: getString(e_date),
+					sDateErr: sDateErr,
+					eDateErr: eDateErr
 				});
 			} else {
 				res.render('not_found_error', {component: 'petid'});
@@ -142,11 +144,21 @@ router.post('/:userid/:petid', function(req, res, next) {
 	s_date = new Date(req.body.s_date.trim());
 	e_date = new Date(req.body.e_date.trim());
 	if (s_date.toString() === 'Invalid Date') {
-		sDateErr = "The start date format is not a valid date format.";
+		sDateErr = "* The start date format is not a valid date format.";
 	}
 	if (e_date.toString() === 'Invalid Date') {
-		eDateErr = "The end date format is not a valid date format.";
+		eDateErr = "* The end date format is not a valid date format.";
 	}
+	res.render('find_caretaker', {
+		title: 'Find Care Taker for ' + petName,
+		category: category,
+		requirements: requirements,
+		careTakers: careTakers,
+		s_date: getString(s_date),
+		e_date: getString(e_date),
+		sDateErr: sDateErr,
+		eDateErr: eDateErr
+	});
 });
 
 module.exports = router;
