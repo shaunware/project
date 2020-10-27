@@ -180,6 +180,20 @@ router.post('/:userid/:petid', function(req, res, next) {
 			sDateErr: sDateErr,
 			eDateErr: eDateErr
 		});
+	} else {
+		pool.query(all_caretaker_query, [category, getString(s_date), getString(e_date)], (err, data) => {
+			careTakers = data.rows;
+		});
+		res.render('find_caretaker', {
+			title: 'Find Care Taker for ' + petName,
+			category: category,
+			requirements: requirements,
+			careTakers: careTakers,
+			s_date: getString(s_date),
+			e_date: getString(e_date),
+			sDateErr: sDateErr,
+			eDateErr: eDateErr
+		});
 	}
 });
 
