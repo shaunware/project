@@ -73,8 +73,8 @@ router.get('/:userid', function(req, res, next) {
 // POST
 router.post('/:userid', function(req, res, next) {
 	// Retrieve Information
-	var petid  = req.body.petid;
-	var name    = req.body.name;
+	var petid  = req.body.petid.toLowerCase().trim();
+	var name    = req.body.name.trim();
 	var category = req.body.category;
 	var owner = req.params.userid; //TODO: Need to replace with user session id
 	var requirements = req.body.requirements;
