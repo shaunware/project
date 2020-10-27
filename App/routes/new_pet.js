@@ -11,6 +11,8 @@ var petowner_exist_query = 'SELECT 1 FROM PetOwners WHERE userid=$1'
 var all_pets_query = 'SELECT petid FROM Pets';
 var pet_exist_query = 'SELECT 1 FROM Pets WHERE petid=$1';
 var all_categories_query = 'SELECT * FROM PetCategories ORDER BY name';
+var category_exist_query = 'SELECT 1 FROM PetCategories WHERE name=$1';
+var insert_category_query = 'INSERT INTO PetCategories VALUES ("$1")';
 var insert_pet_query = 'INSERT INTO Pets VALUES ';
 
 /* Data */
@@ -119,7 +121,17 @@ router.post('/:userid', function(req, res, next) {
 		}
 		if (isValid) {
 			categoryErr = "";
+			category = newCategory;
 		}
+	}
+	if (categoryErr === "") {
+		pool.query(category_exist_query, [category], (err, data) => {
+			if (data.rows.length === 0) {
+				pool.query(insert_category_query, [category], (err, data) => {
+
+				});
+			}
+		});
 	}
 
 	if (petidErr === "" && nameErr === "") {
