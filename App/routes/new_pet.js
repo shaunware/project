@@ -58,6 +58,7 @@ router.get('/:userid', function(req, res, next) {
 				name: "",
 				nameErr: "",
 				category: "",
+				categoryErr: "",
 				requirements: "",
 				userid: req.params.userid
 			});
@@ -122,19 +123,21 @@ router.post('/:userid', function(req, res, next) {
 		if (isValid) {
 			categoryErr = "";
 			category = newCategory;
-		}
-	}
-	if (categoryErr === "") {
-		pool.query(category_exist_query, [category], (err, data) => {
-			if (data.rows.length === 0) {
-				pool.query(insert_category_query, [category], (err, data) => {
+			if (categoryErr === "") {
+				pool.query(category_exist_query, [category], (err, data) => {
+					if (data.rows.length === 0) {
+						pool.query(insert_category_query, [category], (err, data) => {
 
+						});
+					}
 				});
 			}
-		});
+		}
+	} else {
+		categoryErr = "";
 	}
 
-	if (petidErr === "" && nameErr === "") {
+	if (petidErr === "" && nameErr === "" && categoryErr === "") {
 		// Construct Specific SQL Query
 		var insert_query = insert_pet_query + "('" + petid + "','" + name + "','" + category + "','" + owner + "','" + requirements + "')";
 
@@ -142,8 +145,18 @@ router.post('/:userid', function(req, res, next) {
 			res.redirect('/test'); //TODO: Need to update
 		});
 	} else {
-		res.render('new_pet', { title: 'Add New Pet', categories: categories,
-			petid: petid, petidErr: petidErr, name: name, nameErr: nameErr, category: category, requirements: requirements, userid: req.params.userid });
+		res.render('new_pet', {
+			title: 'Add New Pet',
+			categories: categories,
+			petid: petid,
+			petidErr: petidErr,
+			name: name,
+			nameErr: nameErr,
+			category: category,
+			categoryErr: categoryErr,
+			requirements: requirements,
+			userid: req.params.userid
+		});
 	}
 });
 
