@@ -8,8 +8,8 @@ const pool = new Pool({connectionString:process.env.DATABASE_URL})
 /* SQL Query */
 var all_petowner_query = 'SELECT userid FROM PetOwners';
 var petowner_exist_query = 'SELECT 1 FROM PetOwners WHERE userid=$1'
-var all_pets_query = 'SELECT petid FROM Pets';
-var pet_exist_query = 'SELECT 1 FROM Pets WHERE petid=$1';
+var all_pets_query = 'SELECT petid FROM Pets WHERE owner=$1';
+var pet_exist_query = 'SELECT 1 FROM Pets WHERE petid=$1 AND owner=$2';
 var all_categories_query = 'SELECT * FROM PetCategories ORDER BY name';
 var category_exist_query = 'SELECT 1 FROM PetCategories WHERE name=$1';
 var insert_category_query = 'INSERT INTO PetCategories VALUES ';
@@ -25,6 +25,7 @@ var categories;
 /* Err msg */
 var connectionSuccess;
 var isPetOwner;
+var isValidPet;
 var petidErr = "";
 var nameErr = "";
 var categoryErr = "";
@@ -32,6 +33,7 @@ var categoryErr = "";
 // GET
 router.get('/:userid/:petid', function(req, res, next) {
 	userid = req.params.userid; //TODO: May need to update with session user id
+	petid = req.params.petid;
 	pool.query(all_petowner_query, (err, data) => {
 		if (err !== undefined) {
 			connectionSuccess = false;
@@ -40,6 +42,25 @@ router.get('/:userid/:petid', function(req, res, next) {
 			petOwners = data.rows;
 		}
 	});
+	if (connectionSuccess) {
+		pool.query(petowner_exist_query, [userid], (err, data) => {
+			isPetOwner = data.rows.length > 0;
+		});
+		if (isPetOwner) {
+			pool.query(pet_exist_query, [petid, userid], (err, data) => {
+				isValidPet = data.rows.length > 0;
+			})
+			if (isValidPet) {
+
+			} else {
+				res.render('not_found_error', {component: 'petid'});
+			}
+		} else {
+			res.render('not_found_error', {component: 'userid'});
+		}
+	} else {
+		res.render('connection_error');
+	}
 });
 
 // POST
