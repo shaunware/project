@@ -12,6 +12,8 @@
 		<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.6/umd/popper.min.js" integrity="sha384-wHAiFfRlMFy6i5SRaxvfOCifBUQy1xHdJ/yoi7FRNXMRBu5WHdZYu1hA6ZOblgut" crossorigin="anonymous"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/js/bootstrap.min.js" integrity="sha384-B0UglyR+jN6CkvvICOB2joaf5I4l3gm9GU6Hc1og6Ls7i6U/mkkaduKaBhlAXv9k" crossorigin="anonymous"></script>
+	  <script>
+	  </script>
   </head>
   <body>
     <h1><%= title%></h1>
@@ -38,18 +40,39 @@
 				<small id="eDateErr" class="err"><%= eDateErr%></small>
 			<% } %></div>
 		<button type="button" class="btn btn-secondary" id="filter-btn" name="filter-btn">Filter for care takers</button>
+		<button type="button" class="btn btn-secondary" id="show-conflicting-btn" name="show-conflicting-btn">Show conflicting pending transactions</button>
+		<br /><br />
+		<table id="conflicts" class="table">
+			<thead>
+				<tr>
+					<th scope="col">Start Date</th>
+					<th scope="col">End Date</th>
+					<th scope="col">Care Taker ID</th>
+				</tr>
+			</thead>
+			<tbody>
+			<% for (var i=0; i<conflicts.length; i++) { %>
+				<% var getString = (date) => date.getFullYear() + "-" + (date.getMonth() + 1) + "-" + date.getDate(); %>
+				<tr>
+					<td><%= getString(conflicts[i].s_date) %></td>
+					<td><%= getString(conflicts[i].e_date) %></td>
+					<td><%= conflicts[i].ct_id %></td>
+				</tr>
+			<% } %>
+			</tbody>
+		</table>
 		<br /><br />
 		<table id="caretakers" class="table">
 			<thead>
-			<tr>
-				<th scope="col">ID</th>
-				<th scope="col">Name</th>
-				<th scope="col">Average rating</th>
-				<th scope="col">Category</th>
-				<th scope="col">Daily price</th>
-				<th scope="col"><!-- view --></th>
-				<th scope="col"><!-- request --></th>
-			</tr>
+				<tr>
+					<th scope="col">ID</th>
+					<th scope="col">Name</th>
+					<th scope="col">Average rating</th>
+					<th scope="col">Category</th>
+					<th scope="col">Daily price</th>
+					<th scope="col"><!-- view --></th>
+					<th scope="col"><!-- request --></th>
+				</tr>
 			</thead>
 			<tbody>
 			<% for (var i=0; i<careTakers.length; i++) { %>

@@ -58,6 +58,16 @@ WHERE EXISTS(
         AND ((t.e_date>=$2 AND t.e_date<=$3) OR t.s_date<=$3)
     );
  */
+var conflicting_transactions_puery = 'SELECT s_date, e_date, ct_id\n' +
+	'  FROM Transactions\n' +
+	'  WHERE pet_id=$1\n' +
+	'    AND ((e_date>=$2 AND e_date<=$3) OR s_date<=$3)';
+/*
+SELECT s_date, e_date, ct_id
+  FROM Transactions
+  WHERE pet_id=$1
+    AND ((e_date>=$2 AND e_date<=$3) OR s_date<=$3)
+ */
 
 /* Data */
 var userid;
@@ -70,6 +80,7 @@ var petOwners;
 var careTakers;
 var s_date;
 var e_date;
+var conflicts;
 
 /* Util */
 var getString = (date) => date.getFullYear() + "-" + (date.getMonth() + 1) + "-" + date.getDate();
@@ -134,6 +145,9 @@ router.get('/:userid/:petid', function(req, res, next) {
 				pool.query(all_caretaker_query, [category, getString(s_date), getString(e_date), petid], (err, data) => {
 					careTakers = data.rows;
 				})
+				pool.query(conflicting_transactions_puery, [petid, getString(s_date), getString(e_date)], (err, data) => {
+					conflicts = data.rows;
+				})
 				res.render('find_caretaker', {
 					title: 'Find Care Taker for ' + petName,
 					category: category,
@@ -142,7 +156,8 @@ router.get('/:userid/:petid', function(req, res, next) {
 					s_date: getString(s_date),
 					e_date: getString(e_date),
 					sDateErr: sDateErr,
-					eDateErr: eDateErr
+					eDateErr: eDateErr,
+					conflicts: conflicts
 				});
 			} else {
 				res.render('not_found_error', {component: 'petid'});
@@ -196,6 +211,9 @@ router.post('/:userid/:petid', function(req, res, next) {
 		pool.query(all_caretaker_query, [category, getString(s_date), getString(e_date), petid], (err, data) => {
 			careTakers = data.rows;
 		});
+		pool.query(conflicting_transactions_puery, [petid, getString(s_date), getString(e_date)], (err, data) => {
+			conflicts = data.rows;
+		})
 		res.render('find_caretaker', {
 			title: 'Find Care Taker for ' + petName,
 			category: category,
@@ -204,7 +222,8 @@ router.post('/:userid/:petid', function(req, res, next) {
 			s_date: getString(s_date),
 			e_date: getString(e_date),
 			sDateErr: sDateErr,
-			eDateErr: eDateErr
+			eDateErr: eDateErr,
+			conflicts: conflicts
 		});
 	}
 });
