@@ -12,7 +12,7 @@ var all_pets_query = 'SELECT petid FROM Pets';
 var pet_exist_query = 'SELECT 1 FROM Pets WHERE petid=$1';
 var all_categories_query = 'SELECT * FROM PetCategories ORDER BY name';
 var category_exist_query = 'SELECT 1 FROM PetCategories WHERE name=$1';
-var insert_category_query = 'INSERT INTO PetCategories VALUES ("$1")';
+var insert_category_query = 'INSERT INTO PetCategories VALUES ';
 var insert_pet_query = 'INSERT INTO Pets VALUES ';
 
 /* Data */
@@ -121,17 +121,16 @@ router.post('/:userid', function(req, res, next) {
 			}
 		}
 		if (isValid) {
+			console.log(newCategory);
 			categoryErr = "";
 			category = newCategory;
-			if (categoryErr === "") {
-				pool.query(category_exist_query, [category], (err, data) => {
-					if (data.rows.length === 0) {
-						pool.query(insert_category_query, [category], (err, data) => {
-
-						});
-					}
-				});
-			}
+			pool.query(category_exist_query, [category], (err, data) => {
+				if (data.rows.length === 0) {
+					pool.query(insert_category_query + "('" + category + "')", (err, data) => {
+						console.log("Inserted new category: " + category);
+					});
+				}
+			});
 		}
 	} else {
 		categoryErr = "";
@@ -142,6 +141,7 @@ router.post('/:userid', function(req, res, next) {
 		var insert_query = insert_pet_query + "('" + petid + "','" + name + "','" + category + "','" + owner + "','" + requirements + "')";
 
 		pool.query(insert_query, (err, data) => {
+			console.log("Inserted new pet: { petid:" + petid + ", name:" + name + ", category:" + category + ", owner:" + owner + ", requirements:" + requirements + "}" )
 			res.redirect('/test'); //TODO: Need to update
 		});
 	} else {
