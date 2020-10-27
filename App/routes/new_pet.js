@@ -24,6 +24,7 @@ var connectionSuccess;
 var isPetOwner;
 var petidErr = "";
 var nameErr = "";
+var categoryErr = "";
 
 // GET
 router.get('/:userid', function(req, res, next) {
@@ -74,7 +75,7 @@ router.post('/:userid', function(req, res, next) {
 	var category = req.body.category;
 	var owner = req.params.userid; //TODO: Need to replace with user session id
 	var requirements = req.body.requirements;
-	var newCategory = req.body.newCategory.toString().trim();
+	var newCategory = req.body.newCategory.toString().trim().toLowerCase();
 
 	// Validation
 	var found_petid;
@@ -104,6 +105,21 @@ router.post('/:userid', function(req, res, next) {
 		nameErr = "* The pet name should not be empty. Please provide a name.";
 	} else {
 		nameErr = "";
+	}
+	if (newCategory !== "") {
+		var isValid = true;
+		var str = newCategory;
+		var len = str.length;
+		for (var i=0; i<len && isValid; i++) {
+			var c = str.charAt(i);
+			if (!((c < 'z' && c > 'a') || (c = ' '))) {
+				isValid = false;
+				categoryErr = "* The pet category should consist of letters and white space only.";
+			}
+		}
+		if (isValid) {
+			categoryErr = "";
+		}
 	}
 
 	if (petidErr === "" && nameErr === "") {
