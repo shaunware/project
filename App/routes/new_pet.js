@@ -50,6 +50,8 @@ router.get('/:userid', function(req, res, next) {
 			requirements: "",
 			userid: req.params.userid
 		});
+	} else {
+		res.render('connection_error');
 	}
 });
 
