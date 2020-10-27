@@ -23,6 +23,13 @@
 			<p><b>Category: </b><%= category%></p>
 			<p><b>Special requirements: </b><%= requirements%></p>
 		</div>
+		<div class="form-group">
+			<label for="s_date">Start Date</label>
+			<input type="text" class="form-control" id="s_date" name="s_date" placeholder="yyyy-mm-dd" value=<%= s_date%> >
+			<label for="e_date">End Date</label>
+			<input type="text" class="form-control" id="e_date" name="e_date" placeholder="yyyy-mm-dd" value=<%= e_date%> >
+			<button type="submit" class="btn btn-primary">Find care takers</button>
+		</div>
 		<button type="button" class="btn btn-secondary" id="filter-btn" name="filter-btn">Filter for care takers</button>
 		<br /><br />
 		<table id="caretakers" class="table">

@@ -15,3 +15,13 @@ a {
   width: 20%;
   display: inline-block;
 }
+
+#s_date {
+  width: 20%;
+  display: inline-block;
+}
+
+#e_date {
+  width: 20%;
+  display: inline-block;
+}

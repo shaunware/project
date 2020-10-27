@@ -82,7 +82,9 @@ router.get('/:userid/:petid', function(req, res, next) {
 					title: 'Find Care Taker for ' + petName,
 					category: category,
 					requirements: requirements,
-					careTakers: careTakers
+					careTakers: careTakers,
+					s_date: "",
+					e_date: ""
 				});
 			} else {
 				res.render('not_found_error', {component: 'petid'});
