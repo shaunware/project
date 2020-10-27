@@ -13,6 +13,17 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.6/umd/popper.min.js" integrity="sha384-wHAiFfRlMFy6i5SRaxvfOCifBUQy1xHdJ/yoi7FRNXMRBu5WHdZYu1hA6ZOblgut" crossorigin="anonymous"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/js/bootstrap.min.js" integrity="sha384-B0UglyR+jN6CkvvICOB2joaf5I4l3gm9GU6Hc1og6Ls7i6U/mkkaduKaBhlAXv9k" crossorigin="anonymous"></script>
 	  <script>
+		  const toggleConflicts = () => {
+		  	let t = document.getElementById("show-conflicts");
+		  	let b = document.getElementById("show-conflicting-btn");
+			if (t.style.display === "none") {
+				t.style.display = "block";
+				b.innerText = "Hide conflicting pending transactions";
+			} else {
+				t.style.display = "none";
+				b.innerText = "Show conflicting pending transactions";
+			}
+		  };
 	  </script>
   </head>
   <body>
@@ -25,7 +36,7 @@
 			<p><b>Category: </b><%= category%></p>
 			<p><b>Special requirements: </b><%= requirements%></p>
 		</div>
-		<div class="form-group">
+		<div class="form-group" id="date-specification">
 			<label for="s_date">Start Date</label>
 			<input type="text" class="form-control" id="s_date" name="s_date" value=<%= s_date%> >
 			<label for="e_date">End Date</label>
@@ -38,11 +49,13 @@
 			<% if (eDateErr !== "") { %>
 				<br />
 				<small id="eDateErr" class="err"><%= eDateErr%></small>
-			<% } %></div>
+			<% } %>
+		</div>
 		<button type="button" class="btn btn-secondary" id="filter-btn" name="filter-btn">Filter for care takers</button>
-		<button type="button" class="btn btn-secondary" id="show-conflicting-btn" name="show-conflicting-btn">Show conflicting pending transactions</button>
+		<button type="button" class="btn btn-secondary" id="show-conflicting-btn" name="show-conflicting-btn" onclick="toggleConflicts()">Show conflicting pending transactions</button>
 		<br /><br />
-		<table id="conflicts" class="table">
+		<div id="show-conflicts" style="display: none">
+			<table id="conflicts" class="table">
 			<thead>
 				<tr><th scope="colgroup" colspan="5">Conflicting pending transactions:</th></tr>
 				<tr>
@@ -66,6 +79,7 @@
 			<% } %>
 			</tbody>
 		</table>
+		</div>
 		<br /><br />
 		<table id="caretakers" class="table">
 			<thead>
