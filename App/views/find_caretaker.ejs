@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html>
+  <head>
+		<!-- Page Title -->
+    <title><%= title%></title>
+    <link rel='stylesheet' href='/stylesheets/style.css' />
+		
+		<!-- CSS for Styling -->
+		<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css" integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS" crossorigin="anonymous">
+		
+		<!-- JavaScript for Interactivity -->
+		<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.6/umd/popper.min.js" integrity="sha384-wHAiFfRlMFy6i5SRaxvfOCifBUQy1xHdJ/yoi7FRNXMRBu5WHdZYu1hA6ZOblgut" crossorigin="anonymous"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/js/bootstrap.min.js" integrity="sha384-B0UglyR+jN6CkvvICOB2joaf5I4l3gm9GU6Hc1og6Ls7i6U/mkkaduKaBhlAXv9k" crossorigin="anonymous"></script>
+
+	  <script>
+		  const toggle = () => {
+		  	let t = document.getElementById("newCategory");
+			let b = document.getElementById("new-category-btn");
+			let e = document.getElementById("categoryErr");
+		  	if (t.style.display === "none") {
+		  		t.style.display = "block";
+		  		e.style.display = "block";
+				b.innerText = "Cancel";
+			} else {
+		  		t.style.display = "none";
+		  		e.style.display = "none";
+		  		t.nodeValue = "";
+				b.innerText = "New Category";
+			}
+		  };
+	  </script>
+  </head>
+  <body>
+    <h1><%= title%></h1>
+	<form id="html_form" action=<%= userid%> role="form" method="post">
+		<div class="form-group">
+			<label for="petid">Pet ID</label>
+			<input type="text" class="form-control" id="petid" name="petid" aria-describedby="petidHelp" placeholder="Enter your pet ID" value=<%= petid%> >
+			<% if (petidErr !== "") { %>
+				<small id="petidErr" class="err"><%= petidErr %></small>
+			<% } %>
+			<small id="petidHelp" class="form-text text-muted">Do not share your Pet ID with anyone else.</small>
+		</div>
+		<div class="form-group">
+			<label for="name">Name</label>
+			<input type="text" class="form-control" id="name" name="name" placeholder="Enter your pet's name" value=<%= name%> >
+			<% if (nameErr !== "") { %>
+				<small id="nameErr" class="err"><%= nameErr %></small>
+			<% } %>
+		</div>
+		<div class="form-group">
+			<label for="category">Category</label>
+			<% if (categoryErr !== "") {
+				toggle();
+			} %>
+			<button type="button" class="add-button form-control" id="new-category-btn" name="new-category" onclick="toggle()">New Category</button>
+			<input type="text" class="form-control" id="newCategory" name="newCategory" placeholder="Enter new category name" value="<%= category%>" style="display: none;">
+			<% if (categoryErr !== "") { %>
+				<small id="categoryErr" class="err"><%= categoryErr%></small>
+			<% } %>
+			<select class="form-control" id="category" name="category">
+				<% for(var i=0; i<categories.length; i++) { %>
+					<% var selected = categories[i].name === category ? 'selected' : ''; %>
+					<option value="<%= categories[i].name%>%>" <%= selected%> ><%= categories[i].name %></option>
+				<% } %>
+			</select>
+		</div>
+		<div class="form-group">
+			<label for="requirements">Special Requirements</label>
+			<textarea class="form-control" id="requirements" name="requirements" placeholder="Enter special requirements for taking care of your pet"><%= requirements%></textarea>
+		</div>
+		<button type="submit" class="btn btn-primary">Submit</button>
+	</form>
+  </body>
+</html>
