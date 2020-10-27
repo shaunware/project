@@ -51,7 +51,7 @@ router.get('/:userid/:petid', function(req, res, next) {
 				isValidPet = data.rows.length > 0;
 			})
 			if (isValidPet) {
-
+				res.render('find_caretaker', {title: 'Find Care Taker for '});
 			} else {
 				res.render('not_found_error', {component: 'petid'});
 			}
