@@ -19,7 +19,21 @@ var all_caretaker_query = 'SELECT ct.userid AS userid, name, rating, daily_price
 	'      FROM CareTakers\n' +
 	'      WHERE NOT EXISTS(SELECT 1 FROM CannotTakeCare WHERE ct_id=userid AND category=$1)) ct\n' +
 	'    NATURAL JOIN (SELECT userid, name FROM Users) us)\n' +
-	'    LEFT JOIN (SELECT ct_id, daily_price FROM CanTakeCare) ctc ON ct.userid=ctc.ct_id;'
+	'    LEFT JOIN (SELECT ct_id, daily_price FROM CanTakeCare) ctc ON ct.userid=ctc.ct_id;' //all caretakers can take care of this category of pet
+/*
+all_caretaker_query =
+SELECT ct.userid AS userid, name, rating, daily_price,
+       CASE
+           WHEN EXISTS(SELECT 1 FROM FullTimeCareTakers fct WHERE fct.userid=ct.userid) THEN 'Full-time'
+           ELSE 'Part-Time'
+           END
+       AS category
+FROM ((SELECT userid, rating
+      FROM CareTakers
+      WHERE NOT EXISTS(SELECT 1 FROM CannotTakeCare WHERE ct_id=userid AND category=$1)) ct
+    NATURAL JOIN (SELECT userid, name FROM Users) us)
+    LEFT JOIN (SELECT ct_id, daily_price FROM CanTakeCare) ctc ON ct.userid=ctc.ct_id;
+ */
 
 /* Data */
 var userid;

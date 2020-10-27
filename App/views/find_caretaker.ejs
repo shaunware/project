@@ -16,37 +16,41 @@
   <body>
     <h1><%= title%></h1>
 	<a href="../../test"><button class="btn btn-secondary">Edit pet profile</button></a> <!-- TODO: Change to actual edit path -->
-	<a href="../../test"><button class="btn btn-secondary">Cancel</button></a> <!-- TODO: Change to actual pets path -->
-	<div id="pet-info">
-		<p><b>Category: </b><%= category%></p>
-		<p><b>Special requirements: </b><%= requirements%></p>
-	</div>
-	<button type="button" class="btn btn-secondary" id="filter-btn" name="filter-btn">Filter for care takers</button>
-	<table id="caretakers" class="table">
-		<thead>
-		<tr>
-			<th>ID</th>
-			<th>Name</th>
-			<th>Average rating</th>
-			<th>Category</th>
-			<th>Daily price</th>
-			<th><!-- view --></th>
-			<th><!-- request --></th>
-		</tr>
-		</thead>
-		<tbody>
-		<% for (var i=0; i<careTakers.length; i++) { %>
+	<a href="../../test"><button class="btn btn-secondary">Back</button></a> <!-- TODO: Change to actual pets path -->
+	<br /><br />
+	<form id="html_form" role="form" method="post">
+		<div id="pet-info">
+			<p><b>Category: </b><%= category%></p>
+			<p><b>Special requirements: </b><%= requirements%></p>
+		</div>
+		<button type="button" class="btn btn-secondary" id="filter-btn" name="filter-btn">Filter for care takers</button>
+		<br /><br />
+		<table id="caretakers" class="table">
+			<thead>
 			<tr>
-				<td><%= careTakers[i].userid %></td>
-				<td><%= careTakers[i].name %></td>
-				<td><%= careTakers[i].rating %></td>
-				<td><%= careTakers[i].category %></td>
-				<td><%= careTakers[i].daily_price %></td>
-				<td><a href="../../test" target="_blank"><button class="btn btn-primary">View</button></a></td> <!-- TODO: Change to actual view path -->
-				<td><a><button class="btn btn-primary">Request</button></a></td> <!-- TODO: Should be an action that posts -->
+				<th>ID</th>
+				<th>Name</th>
+				<th>Average rating</th>
+				<th>Category</th>
+				<th>Daily price</th>
+				<th><!-- view --></th>
+				<th><!-- request --></th>
 			</tr>
-		<% } %>
-		</tbody>
-	</table>
+			</thead>
+			<tbody>
+			<% for (var i=0; i<careTakers.length; i++) { %>
+				<tr>
+					<td><%= careTakers[i].userid %></td>
+					<td><%= careTakers[i].name %></td>
+					<td><%= careTakers[i].rating %></td>
+					<td><%= careTakers[i].category %></td>
+					<td><%= careTakers[i].daily_price %></td>
+					<td><a href="../../test" target="_blank"><button class="btn btn-primary">View</button></a></td> <!-- TODO: Change to actual view path -->
+					<td><a><button class="btn btn-primary">Request</button></a></td> <!-- TODO: Should be an action that posts -->
+				</tr>
+			<% } %>
+			</tbody>
+		</table>
+	</form>
   </body>
 </html>
