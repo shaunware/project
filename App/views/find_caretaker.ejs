@@ -21,7 +21,7 @@
 		<p><b>Category: </b><%= category%></p>
 		<p><b>Special requirements: </b><%= requirements%></p>
 	</div>
-
+	<button type="button" class="btn btn-secondary" id="filter-btn" name="filter-btn">Filter for care takers</button>
 	<table id="caretakers" class="table">
 		<thead>
 		<tr>
@@ -31,6 +31,7 @@
 			<th>Category</th>
 			<th>Daily price</th>
 			<th><!-- view --></th>
+			<th><!-- request --></th>
 		</tr>
 		</thead>
 		<tbody>
@@ -41,6 +42,8 @@
 				<td><%= careTakers[i].rating %></td>
 				<td><%= careTakers[i].category %></td>
 				<td><%= careTakers[i].daily_price %></td>
+				<td><a href="../../test" target="_blank"><button class="btn btn-primary">View</button></a></td> <!-- TODO: Change to actual view path -->
+				<td><a><button class="btn btn-primary">Request</button></a></td> <!-- TODO: Should be an action that posts -->
 			</tr>
 		<% } %>
 		</tbody>
