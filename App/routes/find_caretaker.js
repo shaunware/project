@@ -44,6 +44,8 @@ var category;
 var requirements;
 var petOwners;
 var careTakers;
+var s_date = new Date();
+var e_date;
 
 /* Err msg */
 var connectionSuccess;
@@ -75,6 +77,8 @@ router.get('/:userid/:petid', function(req, res, next) {
 				petName = pet[0].name;
 				category = pet[0].category;
 				requirements = pet[0].requirements;
+				e_date = new Date(s_date);
+				e_date.setDate(s_date.getDate() + 7);
 				pool.query(all_caretaker_query, [category], (err, data) => {
 					careTakers = data.rows;
 				})
@@ -83,8 +87,8 @@ router.get('/:userid/:petid', function(req, res, next) {
 					category: category,
 					requirements: requirements,
 					careTakers: careTakers,
-					s_date: "",
-					e_date: ""
+					s_date: s_date.getFullYear() + "-" + s_date.getMonth() + "-" + s_date.getDate(),
+					e_date: e_date.getFullYear() + "-" + e_date.getMonth() + "-" + e_date.getDate()
 				});
 			} else {
 				res.render('not_found_error', {component: 'petid'});
@@ -98,8 +102,8 @@ router.get('/:userid/:petid', function(req, res, next) {
 });
 
 // POST
-router.post('/:userid', function(req, res, next) {
-
+router.post('/:userid/:petid', function(req, res, next) {
+	petid = req.params.petid;
 });
 
 module.exports = router;
