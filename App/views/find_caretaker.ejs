@@ -55,63 +55,65 @@
 				<small id="dateConflictErr" class="err"><%= dateConflictErr%></small>
 			<% } %>
 		</div>
-		<button type="button" class="btn btn-secondary" id="filter-btn" name="filter-btn">Filter for care takers</button>
-		<button type="button" class="btn btn-secondary" id="show-conflicting-btn" name="show-conflicting-btn" onclick="toggleConflicts()">Show conflicting pending transactions</button>
-		<div id="show-conflicts" style="display: none">
-			<br />
-			<table id="conflicts" class="table">
-			<thead>
-				<tr><th scope="colgroup" colspan="5">Conflicting pending transactions:</th></tr>
-				<tr>
-					<th scope="col">Start Date</th>
-					<th scope="col">End Date</th>
-					<th scope="col">Care Taker ID</th>
-					<th scope="col"><!-- view --></th>
-					<th scope="col"><!-- withdraw --></th>
-				</tr>
-			</thead>
-			<tbody>
-			<% for (var i=0; i<conflicts.length; i++) { %>
-				<% var getString = (date) => date.getFullYear() + "-" + (date.getMonth() + 1) + "-" + date.getDate(); %>
-				<tr>
+	</form>
+	<button type="button" class="btn btn-secondary" id="filter-btn" name="filter-btn">Filter for care takers</button>
+	<button type="button" class="btn btn-secondary" id="show-conflicting-btn" name="show-conflicting-btn" onclick="toggleConflicts()">Show conflicting pending transactions</button>
+	<div id="show-conflicts" style="display: none">
+		<br />
+		<table id="conflicts" class="table">
+		<thead>
+			<tr><th scope="colgroup" colspan="5">Conflicting pending transactions:</th></tr>
+			<tr>
+				<th scope="col">Start Date</th>
+				<th scope="col">End Date</th>
+				<th scope="col">Care Taker ID</th>
+				<th scope="col"><!-- view --></th>
+				<th scope="col"><!-- withdraw --></th>
+			</tr>
+		</thead>
+		<tbody>
+		<% for (var i=0; i<conflicts.length; i++) { %>
+			<% var getString = (date) => date.getFullYear() + "-" + (date.getMonth() + 1) + "-" + date.getDate(); %>
+			<tr>
+				<form  action="delete_pending/<%=conflicts[i].ct_id%>" method="post">
 					<td><%= getString(conflicts[i].s_date) %></td>
 					<td><%= getString(conflicts[i].e_date) %></td>
 					<td><%= conflicts[i].ct_id %></td>
-					<td><a href="../../test" target="_blank"><button class="btn btn-primary">View</button></a></td> <!-- TODO: Change to actual view path -->
-					<td><a><button class="btn btn-primary">Withdraw</button></a></td> <!-- TODO: Should be an action that posts -->
-				</tr>
-			<% } %>
-			</tbody>
-		</table>
-		</div>
-		<br /><br />
-		<table id="caretakers" class="table">
-			<thead>
-				<tr><th scope="colgroup" colspan="7">Possible Care Takers you can request for taking care of your pet:</th></tr>
-				<tr>
-					<th scope="col">ID</th>
-					<th scope="col">Name</th>
-					<th scope="col">Average rating</th>
-					<th scope="col">Category</th>
-					<th scope="col">Daily price</th>
-					<th scope="col"><!-- view --></th>
-					<th scope="col"><!-- request --></th>
-				</tr>
-			</thead>
-			<tbody>
-			<% for (var i=0; i<careTakers.length; i++) { %>
-				<tr>
-					<td><%= careTakers[i].userid %></td>
-					<td><%= careTakers[i].name %></td>
-					<td><%= careTakers[i].rating %></td>
-					<td><%= careTakers[i].category %></td>
-					<td><%= careTakers[i].daily_price %></td>
-					<td><a href="../../test" target="_blank"><button class="btn btn-primary">View</button></a></td> <!-- TODO: Change to actual view path -->
-					<td><a><button class="btn btn-primary">Request</button></a></td> <!-- TODO: Should be an action that posts -->
-				</tr>
-			<% } %>
-			</tbody>
-		</table>
-	</form>
+					<td><a href="../../../test" target="_blank"><button class="btn btn-primary" type="button">View</button></a></td> <!-- TODO: Change to actual view path -->
+					<td><button class="btn btn-primary" type="submit">Withdraw</button></td> <!-- TODO: Should be an action that posts -->
+				</form>
+			</tr>
+		<% } %>
+		</tbody>
+	</table>
+	</div>
+	<br /><br />
+	<table id="caretakers" class="table">
+		<thead>
+			<tr><th scope="colgroup" colspan="7">Possible Care Takers you can request for taking care of your pet:</th></tr>
+			<tr>
+				<th scope="col">ID</th>
+				<th scope="col">Name</th>
+				<th scope="col">Average rating</th>
+				<th scope="col">Category</th>
+				<th scope="col">Daily price</th>
+				<th scope="col"><!-- view --></th>
+				<th scope="col"><!-- request --></th>
+			</tr>
+		</thead>
+		<tbody>
+		<% for (var i=0; i<careTakers.length; i++) { %>
+			<tr>
+				<td><%= careTakers[i].userid %></td>
+				<td><%= careTakers[i].name %></td>
+				<td><%= careTakers[i].rating %></td>
+				<td><%= careTakers[i].category %></td>
+				<td><%= careTakers[i].daily_price %></td>
+				<td><a href="../../test" target="_blank"><button class="btn btn-primary">View</button></a></td> <!-- TODO: Change to actual view path -->
+				<td><a><button class="btn btn-primary">Request</button></a></td> <!-- TODO: Should be an action that posts -->
+			</tr>
+		<% } %>
+		</tbody>
+	</table>
   </body>
 </html>
