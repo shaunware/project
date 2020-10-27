@@ -1,5 +1,6 @@
 var express = require('express');
 var router = express.Router();
+var url = require('url');
 require('dotenv').config({path: __dirname + '/../.env'});
 
 const { Pool } = require('pg')
@@ -125,7 +126,6 @@ var refreshPage = (res) => {
 	res.render('find_caretaker', {
 		title: 'Find Care Taker for ' + petName,
 		petid: petid,
-		userid: userid,
 		category: category,
 		requirements: requirements,
 		careTakers: careTakers,
@@ -148,6 +148,13 @@ var dateConflictErr = "";
 
 // GET
 router.get('/:userid/:petid', function(req, res, next) {
+	s_date = req.query.s_date ? new Date(req.query.s_date) : new Date();
+	if (req.query.e_date) {
+		e_date = new Date(req.query.e_date);
+	} else {
+		e_date = new Date(s_date);
+		e_date.setDate(s_date.getDate() + 7);
+	}
 	userid = req.params.userid; //TODO: May need to update with session user id
 	petid = req.params.petid;
 	pool.query(all_petowner_query, (err, data) => {
@@ -170,9 +177,6 @@ router.get('/:userid/:petid', function(req, res, next) {
 					petName = pet[0].name;
 					category = pet[0].category;
 					requirements = pet[0].requirements;
-					s_date = new Date();
-					e_date = new Date(s_date);
-					e_date.setDate(s_date.getDate() + 7);
 					pool.query(all_caretaker_query, [category, getString(s_date), getString(e_date), petid], (err, data) => {
 						careTakers = data.rows;
 						pool.query(conflicting_transactions_query, [petid, getString(s_date), getString(e_date)], (err, data) => {
@@ -241,11 +245,18 @@ router.post('/:userid/:petid', function(req, res, next) {
 
 // DELETE PENDING
 router.post('/:userid/:petid/delete_pending/:ct_id', function(req, res, next) {
+	userid = req.params.userid;
 	petid = req.params.petid;
 	ct_id = req.params.ct_id;
 	pool.query(delete_pending_query, [petid, getString(s_date), getString(e_date), ct_id], (err, data) => {
 		console.log("Deleted the conflicting pending transaction");
-		res.redirect('../');
+		res.redirect(url.format({
+			pathname:"/find_caretaker/" + userid + "/" + petid,
+			query: {
+				"s_date": getString(s_date),
+				"e_date": getString(e_date)
+			}
+		}));
 	})
 });
 

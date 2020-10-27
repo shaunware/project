@@ -75,7 +75,7 @@
 		<% for (var i=0; i<conflicts.length; i++) { %>
 			<% var getString = (date) => date.getFullYear() + "-" + (date.getMonth() + 1) + "-" + date.getDate(); %>
 			<tr>
-				<form  action="delete_pending/<%=conflicts[i].ct_id%>" method="post">
+				<form  action="<%=petid%>/delete_pending/<%=conflicts[i].ct_id%>" method="post">
 					<td><%= getString(conflicts[i].s_date) %></td>
 					<td><%= getString(conflicts[i].e_date) %></td>
 					<td><%= conflicts[i].ct_id %></td>
