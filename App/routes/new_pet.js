@@ -9,6 +9,7 @@ const pool = new Pool({connectionString:process.env.DATABASE_URL})
 var all_petowner_query = 'SELECT userid FROM PetOwners';
 var petowner_exist_query = 'SELECT 1 FROM PetOwners WHERE userid=$1'
 var all_pets_query = 'SELECT petid FROM Pets';
+var pet_exist_query = 'SELECT 1 FROM Pets WHERE petid=$1';
 var all_categories_query = 'SELECT * FROM PetCategories ORDER BY name';
 var insert_pet_query = 'INSERT INTO Pets VALUES ';
 
@@ -34,7 +35,7 @@ router.get('/:userid', function(req, res, next) {
 			petOwners = data.rows;
 		}
 	});
-	userid = req.params.userid;
+	userid = req.params.userid; //TODO: Need to replace with user session id
 	if (connectionSuccess) {
 		pool.query(petowner_exist_query, [userid], (err, data) => {
 			isPetOwner = data.rows.length > 0;
@@ -71,18 +72,15 @@ router.post('/:userid', function(req, res, next) {
 	var petid  = req.body.petid;
 	var name    = req.body.name;
 	var category = req.body.category;
-	var owner = req.params.userid;
+	var owner = req.params.userid; //TODO: Need to replace with user session id
 	var requirements = req.body.requirements;
 	var newCategory = req.body.newCategory.toString().trim();
 
 	// Validation
 	var found_petid;
-	for (var i=0; i<pets.length; i++) {
-		if (petid === pets[i].petid) {
-			found_petid = true;
-			break;
-		}
-	}
+	pool.query(pet_exist_query, [petid], (err, data) => {
+		found_petid = data.rows.length > 0;
+	});
 	if (found_petid) {
 		petidErr = "* The pet id already exists. Please choose another pet id.";
 	} else if (petid === "") {
