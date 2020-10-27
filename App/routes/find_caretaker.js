@@ -47,6 +47,9 @@ var careTakers;
 var s_date = new Date();
 var e_date;
 
+/* Util */
+var getString = (date) => date.getFullYear() + "-" + date.getMonth() + "-" + date.getDate();
+
 /* Err msg */
 var connectionSuccess;
 var isPetOwner;
@@ -87,8 +90,8 @@ router.get('/:userid/:petid', function(req, res, next) {
 					category: category,
 					requirements: requirements,
 					careTakers: careTakers,
-					s_date: s_date.getFullYear() + "-" + s_date.getMonth() + "-" + s_date.getDate(),
-					e_date: e_date.getFullYear() + "-" + e_date.getMonth() + "-" + e_date.getDate()
+					s_date: getString(s_date),
+					e_date: getString(e_date)
 				});
 			} else {
 				res.render('not_found_error', {component: 'petid'});
