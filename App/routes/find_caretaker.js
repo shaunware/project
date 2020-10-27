@@ -68,6 +68,14 @@ SELECT s_date, e_date, ct_id
   WHERE pet_id=$1
     AND ((e_date>=$2 AND e_date<=$3) OR s_date<=$3)
  */
+var conflicting_real_transactions_query = 'SELECT 1 FROM RealTransactions\n' +
+	'  WHERE pet_id=$1\n' +
+	'  AND ((e_date>=$2 AND e_date<=$3) OR s_date<=$3)';
+/*
+SELECT 1 FROM RealTransactions
+  WHERE pet_id=$1
+  AND ((e_date>=$2 AND e_date<=$3) OR s_date<=$3)
+ */
 
 /* Data */
 var userid;
@@ -106,6 +114,20 @@ var isIn2Years = d => {
 	d1.setFullYear(d.getFullYear() + 2);
 	return compareDates(d, d1) < 0;
 }
+var refreshPage = (res) => {
+	res.render('find_caretaker', {
+		title: 'Find Care Taker for ' + petName,
+		category: category,
+		requirements: requirements,
+		careTakers: careTakers,
+		s_date: getString(s_date),
+		e_date: getString(e_date),
+		sDateErr: sDateErr,
+		eDateErr: eDateErr,
+		dateConflictErr: dateConflictErr,
+		conflicts: conflicts
+	});
+}
 
 /* Err msg */
 var connectionSuccess;
@@ -113,6 +135,7 @@ var isPetOwner;
 var isValidPet;
 var sDateErr = "";
 var eDateErr = "";
+var dateConflictErr = "";
 
 // GET
 router.get('/:userid/:petid', function(req, res, next) {
@@ -145,17 +168,7 @@ router.get('/:userid/:petid', function(req, res, next) {
 						careTakers = data.rows;
 						pool.query(conflicting_transactions_puery, [petid, getString(s_date), getString(e_date)], (err, data) => {
 							conflicts = data.rows;
-							res.render('find_caretaker', {
-								title: 'Find Care Taker for ' + petName,
-								category: category,
-								requirements: requirements,
-								careTakers: careTakers,
-								s_date: getString(s_date),
-								e_date: getString(e_date),
-								sDateErr: sDateErr,
-								eDateErr: eDateErr,
-								conflicts: conflicts
-							});
+							refreshPage(res);
 						});
 					});
 				} else {
@@ -197,35 +210,22 @@ router.post('/:userid/:petid', function(req, res, next) {
 		eDateErr = "";
 	}
 	if (sDateErr !== "" || eDateErr !== "") {
-		res.render('find_caretaker', {
-			title: 'Find Care Taker for ' + petName,
-			category: category,
-			requirements: requirements,
-			careTakers: careTakers,
-			s_date: getString(s_date),
-			e_date: getString(e_date),
-			sDateErr: sDateErr,
-			eDateErr: eDateErr,
-			conflicts: conflicts
-		});
+		refreshPage(res);
 	} else {
-		pool.query(all_caretaker_query, [category, getString(s_date), getString(e_date), petid], (err, data) => {
-			careTakers = data.rows;
-			pool.query(conflicting_transactions_puery, [petid, getString(s_date), getString(e_date)], (err, data) => {
-				conflicts = data.rows;
-				res.render('find_caretaker', {
-					title: 'Find Care Taker for ' + petName,
-					category: category,
-					requirements: requirements,
-					careTakers: careTakers,
-					s_date: getString(s_date),
-					e_date: getString(e_date),
-					sDateErr: sDateErr,
-					eDateErr: eDateErr,
-					conflicts: conflicts
+		pool.query(conflicting_real_transactions_query, [petid, getString(s_date), getString(e_date)], (err, data) => {
+			dateConflictErr = data.rows.length > 0 ? "* There are running transactions of the pet conflicting the input dates." : "";
+			if (dateConflictErr === "") {
+				pool.query(all_caretaker_query, [category, getString(s_date), getString(e_date), petid], (err, data) => {
+					careTakers = data.rows;
+					pool.query(conflicting_transactions_puery, [petid, getString(s_date), getString(e_date)], (err, data) => {
+						conflicts = data.rows;
+						refreshPage(res);
+					});
 				});
-			});
-		});
+			} else {
+				refreshPage(res);
+			}
+		})
 	}
 });
 

@@ -50,11 +50,15 @@
 				<br />
 				<small id="eDateErr" class="err"><%= eDateErr%></small>
 			<% } %>
+			<% if (dateConflictErr !== "") { %>
+				<br />
+				<small id="dateConflictErr" class="err"><%= dateConflictErr%></small>
+			<% } %>
 		</div>
 		<button type="button" class="btn btn-secondary" id="filter-btn" name="filter-btn">Filter for care takers</button>
 		<button type="button" class="btn btn-secondary" id="show-conflicting-btn" name="show-conflicting-btn" onclick="toggleConflicts()">Show conflicting pending transactions</button>
-		<br /><br />
 		<div id="show-conflicts" style="display: none">
+			<br />
 			<table id="conflicts" class="table">
 			<thead>
 				<tr><th scope="colgroup" colspan="5">Conflicting pending transactions:</th></tr>
