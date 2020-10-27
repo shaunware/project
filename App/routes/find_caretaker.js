@@ -17,6 +17,7 @@ var insert_pet_query = 'INSERT INTO Pets VALUES ';
 
 /* Data */
 var userid;
+var petid;
 var petOwners;
 var pets;
 var categories;
@@ -29,7 +30,8 @@ var nameErr = "";
 var categoryErr = "";
 
 // GET
-router.get('/:userid', function(req, res, next) {
+router.get('/:userid/:petid', function(req, res, next) {
+	userid = req.params.userid; //TODO: May need to update with session user id
 	pool.query(all_petowner_query, (err, data) => {
 		if (err !== undefined) {
 			connectionSuccess = false;
@@ -38,36 +40,6 @@ router.get('/:userid', function(req, res, next) {
 			petOwners = data.rows;
 		}
 	});
-	userid = req.params.userid; //TODO: Need to replace with user session id
-	if (connectionSuccess) {
-		pool.query(petowner_exist_query, [userid], (err, data) => {
-			isPetOwner = data.rows.length > 0;
-		});
-		if (isPetOwner) {
-			pool.query(all_pets_query, (err, data) => {
-				pets = data.rows;
-			});
-			pool.query(all_categories_query, (err, data) => {
-				categories = data.rows;
-			});
-			res.render('new_pet', {
-				title: 'Add New Pet',
-				categories: categories,
-				petid: "",
-				petidErr: "",
-				name: "",
-				nameErr: "",
-				category: "",
-				categoryErr: "",
-				requirements: "",
-				userid: req.params.userid
-			});
-		} else {
-			res.render('not_found_error', {component: 'userid'});
-		}
-	} else {
-		res.render('connection_error');
-	}
 });
 
 // POST
