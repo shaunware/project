@@ -23,9 +23,15 @@ var all_caretaker_query = 'SELECT ct.userid AS userid, name, rating, daily_price
 	'WHERE EXISTS(\n' +
 	'    SELECT 1 FROM PeriodsAvailable pa\n' +
 	'    WHERE pa.ct_id=ct.userid\n' +
-	'      AND s_date <= $2\n' +
-	'      AND e_date >= $3\n' +
-	'          );' //all caretakers can take care of this category of pet at this period of time
+	'      AND s_date<=$2\n' +
+	'      AND e_date>=$3\n' +
+	'          )\n' +
+	'  AND NOT EXISTS(\n' +
+	'      SELECT 1 FROM Transactions t\n' +
+	'      WHERE t.pet_id=$4\n' +
+	'        AND t.ct_id=ct.userid\n' +
+	'        AND ((t.e_date>=$2 AND t.e_date<=$3) OR t.s_date<=$3)\n' +
+	'    );' //all caretakers can take care of this category of pet at this period of time and no conflicting transaction exists
 /*
 all_caretaker_query =
 SELECT ct.userid AS userid, name, rating, daily_price,
@@ -42,9 +48,15 @@ FROM ((SELECT userid, rating
 WHERE EXISTS(
     SELECT 1 FROM PeriodsAvailable pa
     WHERE pa.ct_id=ct.userid
-      AND s_date <= $2
-      AND e_date >= $3
-          );
+      AND s_date<=$2
+      AND e_date>=$3
+          )
+  AND NOT EXISTS(
+      SELECT 1 FROM Transactions t
+      WHERE t.pet_id=$4
+        AND t.ct_id=ct.userid
+        AND ((t.e_date>=$2 AND t.e_date<=$3) OR t.s_date<=$3)
+    );
  */
 
 /* Data */
@@ -119,7 +131,7 @@ router.get('/:userid/:petid', function(req, res, next) {
 				s_date = new Date();
 				e_date = new Date(s_date);
 				e_date.setDate(s_date.getDate() + 7);
-				pool.query(all_caretaker_query, [category, getString(s_date), getString(e_date)], (err, data) => {
+				pool.query(all_caretaker_query, [category, getString(s_date), getString(e_date), petid], (err, data) => {
 					careTakers = data.rows;
 				})
 				res.render('find_caretaker', {
@@ -181,7 +193,7 @@ router.post('/:userid/:petid', function(req, res, next) {
 			eDateErr: eDateErr
 		});
 	} else {
-		pool.query(all_caretaker_query, [category, getString(s_date), getString(e_date)], (err, data) => {
+		pool.query(all_caretaker_query, [category, getString(s_date), getString(e_date), petid], (err, data) => {
 			careTakers = data.rows;
 		});
 		res.render('find_caretaker', {
