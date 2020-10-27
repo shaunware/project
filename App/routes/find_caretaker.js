@@ -9,7 +9,17 @@ const pool = new Pool({connectionString:process.env.DATABASE_URL})
 var all_petowner_query = 'SELECT userid FROM PetOwners';
 var petowner_exist_query = 'SELECT 1 FROM PetOwners WHERE userid=$1'
 var pet_exist_query = 'SELECT * FROM Pets WHERE petid=$1 AND owner=$2';
-var all_caretaker_query = 'SELECT userid FROM CareTakers EXCEPT SELECT userid FROM CannotTakeCare WHERE category=$1'
+var all_caretaker_query = 'SELECT ct.userid AS userid, name, rating, daily_price,\n' +
+	'       CASE\n' +
+	'           WHEN EXISTS(SELECT 1 FROM FullTimeCareTakers fct WHERE fct.userid=ct.userid) THEN \'Full-time\'\n' +
+	'           ELSE \'Part-Time\'\n' +
+	'           END\n' +
+	'                 AS category\n' +
+	'FROM ((SELECT userid, rating\n' +
+	'      FROM CareTakers\n' +
+	'      WHERE NOT EXISTS(SELECT 1 FROM CannotTakeCare WHERE ct_id=userid AND category=$1)) ct\n' +
+	'    NATURAL JOIN (SELECT userid, name FROM Users) us)\n' +
+	'    LEFT JOIN (SELECT ct_id, daily_price FROM CanTakeCare) ctc ON ct.userid=ctc.ct_id;'
 
 /* Data */
 var userid;
@@ -52,6 +62,9 @@ router.get('/:userid/:petid', function(req, res, next) {
 				category = pet[0].category;
 				requirements = pet[0].requirements;
 				pool.query(all_caretaker_query, [category], (err, data) => {
+					console.log(err);
+					console.log(data);
+					console.log()
 					careTakers = data.rows;
 				})
 				res.render('find_caretaker', {

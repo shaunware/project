@@ -20,6 +20,25 @@
 	<div id="pet-info">
 		<p><b>Category: </b><%= category%></p>
 		<p><b>Special requirements: </b><%= requirements%></p>
+		<table id="caretakers">
+			<thead>
+				<tr>
+					<th>ID</th>
+					<th>Name</th>
+					<th>Average rating</th>
+					<th>Category</th>
+					<th>Daily price</th>
+					<th><!-- view --></th>
+				</tr>
+			</thead>
+			<tbody>
+				<% for (var i=0; i<careTakers.length; i++) { %>
+					<tr>
+						<td><%= careTakers[i].userid %></td>
+					</tr>
+				<% } %>
+			</tbody>
+		</table>
 	</div>
   </body>
 </html>
