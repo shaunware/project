@@ -62,9 +62,6 @@ router.get('/:userid/:petid', function(req, res, next) {
 				category = pet[0].category;
 				requirements = pet[0].requirements;
 				pool.query(all_caretaker_query, [category], (err, data) => {
-					console.log(err);
-					console.log(data);
-					console.log()
 					careTakers = data.rows;
 				})
 				res.render('find_caretaker', {
