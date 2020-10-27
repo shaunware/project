@@ -9,7 +9,7 @@ const pool = new Pool({connectionString:process.env.DATABASE_URL})
 var all_petowner_query = 'SELECT userid FROM PetOwners';
 var petowner_exist_query = 'SELECT 1 FROM PetOwners WHERE userid=$1'
 var all_pets_query = 'SELECT petid FROM Pets WHERE owner=$1';
-var pet_exist_query = 'SELECT 1 FROM Pets WHERE petid=$1 AND owner=$2';
+var pet_exist_query = 'SELECT * FROM Pets WHERE petid=$1 AND owner=$2';
 var all_categories_query = 'SELECT * FROM PetCategories ORDER BY name';
 var category_exist_query = 'SELECT 1 FROM PetCategories WHERE name=$1';
 var insert_category_query = 'INSERT INTO PetCategories VALUES ';
@@ -18,6 +18,10 @@ var insert_pet_query = 'INSERT INTO Pets VALUES ';
 /* Data */
 var userid;
 var petid;
+var pet;
+var petName;
+var category;
+var requirements;
 var petOwners;
 var pets;
 var categories;
@@ -49,9 +53,17 @@ router.get('/:userid/:petid', function(req, res, next) {
 		if (isPetOwner) {
 			pool.query(pet_exist_query, [petid, userid], (err, data) => {
 				isValidPet = data.rows.length > 0;
+				pet = data.rows;
 			})
 			if (isValidPet) {
-				res.render('find_caretaker', {title: 'Find Care Taker for '});
+				petName = pet[0].name;
+				category = pet[0].category;
+				requirements = pet[0].requirements;
+				res.render('find_caretaker', {
+					title: 'Find Care Taker for ' + petName,
+					category: category,
+					requirements: requirements
+				});
 			} else {
 				res.render('not_found_error', {component: 'petid'});
 			}
