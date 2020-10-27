@@ -6,27 +6,51 @@ const { Pool } = require('pg')
 const pool = new Pool({connectionString:process.env.DATABASE_URL})
 
 /* SQL Query */
+var all_petowner_query = 'SELECT userid FROM PetOwners';
 var all_pets_query = 'SELECT petid FROM Pets';
 var all_categories_query = 'SELECT * FROM PetCategories ORDER BY name';
 var sql_query = 'INSERT INTO Pets VALUES ';
 
 /* Data */
+var petOwners;
 var pets;
 var categories;
 
 /* Err msg */
+var connectionSuccess;
+var isPetOwner;
 var petidErr = "";
 var nameErr = "";
 
 // GET
 router.get('/:userid', function(req, res, next) {
-	pool.query(all_pets_query, (err, data) => {
-		pets = data.rows;
-	})
-	pool.query(all_categories_query, (err, data) => {
-		categories = data.rows;
-	})
-	res.render('new_pet', { title: 'Add New Pet', categories: categories, petid: "", petidErr: "", name: "", nameErr: "", category: "", requirements: "", userid: req.params.userid });
+	pool.query(all_petowner_query, (err, data) => {
+		if (err !== undefined) {
+			connectionSuccess = false;
+		} else {
+			connectionSuccess = true;
+			petOwners = data.rows;
+		}
+	});
+	if (connectionSuccess) {
+		pool.query(all_pets_query, (err, data) => {
+			pets = data.rows;
+		})
+		pool.query(all_categories_query, (err, data) => {
+			categories = data.rows;
+		})
+		res.render('new_pet', {
+			title: 'Add New Pet',
+			categories: categories,
+			petid: "",
+			petidErr: "",
+			name: "",
+			nameErr: "",
+			category: "",
+			requirements: "",
+			userid: req.params.userid
+		});
+	}
 });
 
 // POST
@@ -37,7 +61,7 @@ router.post('/:userid', function(req, res, next) {
 	var category = req.body.category;
 	var owner = req.params.userid;
 	var requirements = req.body.requirements;
-	console.log("HERE: " + req.body.newCategory);
+	var newCategory = req.body.newCategory.toString().trim();
 
 	// Validation
 	var found_petid;
