@@ -7,11 +7,13 @@ const pool = new Pool({connectionString:process.env.DATABASE_URL})
 
 /* SQL Query */
 var all_petowner_query = 'SELECT userid FROM PetOwners';
+var petowner_exist_query = 'SELECT 1 FROM PetOwners WHERE userid=$1'
 var all_pets_query = 'SELECT petid FROM Pets';
 var all_categories_query = 'SELECT * FROM PetCategories ORDER BY name';
-var sql_query = 'INSERT INTO Pets VALUES ';
+var insert_pet_query = 'INSERT INTO Pets VALUES ';
 
 /* Data */
+var userid;
 var petOwners;
 var pets;
 var categories;
@@ -32,24 +34,32 @@ router.get('/:userid', function(req, res, next) {
 			petOwners = data.rows;
 		}
 	});
+	userid = req.params.userid;
 	if (connectionSuccess) {
-		pool.query(all_pets_query, (err, data) => {
-			pets = data.rows;
-		})
-		pool.query(all_categories_query, (err, data) => {
-			categories = data.rows;
-		})
-		res.render('new_pet', {
-			title: 'Add New Pet',
-			categories: categories,
-			petid: "",
-			petidErr: "",
-			name: "",
-			nameErr: "",
-			category: "",
-			requirements: "",
-			userid: req.params.userid
+		pool.query(petowner_exist_query, [userid], (err, data) => {
+			isPetOwner = data.rows.length > 0;
 		});
+		if (isPetOwner) {
+			pool.query(all_pets_query, (err, data) => {
+				pets = data.rows;
+			});
+			pool.query(all_categories_query, (err, data) => {
+				categories = data.rows;
+			});
+			res.render('new_pet', {
+				title: 'Add New Pet',
+				categories: categories,
+				petid: "",
+				petidErr: "",
+				name: "",
+				nameErr: "",
+				category: "",
+				requirements: "",
+				userid: req.params.userid
+			});
+		} else {
+
+		}
 	} else {
 		res.render('connection_error');
 	}
@@ -100,7 +110,7 @@ router.post('/:userid', function(req, res, next) {
 
 	if (petidErr === "" && nameErr === "") {
 		// Construct Specific SQL Query
-		var insert_query = sql_query + "('" + petid + "','" + name + "','" + category + "','" + owner + "','" + requirements + "')";
+		var insert_query = insert_pet_query + "('" + petid + "','" + name + "','" + category + "','" + owner + "','" + requirements + "')";
 
 		pool.query(insert_query, (err, data) => {
 			res.redirect('/test'); //TODO: Need to update
