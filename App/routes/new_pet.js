@@ -58,7 +58,7 @@ router.get('/:userid', function(req, res, next) {
 				userid: req.params.userid
 			});
 		} else {
-
+			res.render('not_found_error', {component: 'userid'});
 		}
 	} else {
 		res.render('connection_error');
