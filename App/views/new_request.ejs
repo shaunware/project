@@ -46,14 +46,14 @@
 		<div class="form-group" id="transfer-type-specification">
 			<label for="transfer_type">Transfer type: </label>
 			<select class="form-control" id="transfer_type" name="transfer_type" style="width: 150px; display: inline-flex">
-				<option value="deliver">deliver</option>
-				<option value="pick-up">pick-up</option>
-				<option value="building">transfer at the PSC building</option>
+				<option value="deliver" <%=transfer_type === 'deliver' ? 'selected' : ''%>>deliver</option>
+				<option value="pick-up" <%=transfer_type === 'pick-up' ? 'selected' : ''%>>pick-up</option>
+				<option value="transfer at building" <%=transfer_type === 'transfer at building' ? 'selected' : ''%>>transfer at the PSC building</option>
 			</select>
 			<label for="payment_method" style="padding-left: 30px">Payment method: </label>
 			<select class="form-control" id="payment_method" name="payment_method" style="width: 150px; display: inline-flex">
-				<option value="card">card</option>
-				<option value="cash">cash</option>
+				<option value="card" <%=payment_method === 'card' ? 'selected' : ''%>>card</option>
+				<option value="cash" <%=payment_method === 'cash' ? 'selected' : ''%>>cash</option>
 			</select>
 		</div>
 		<button type="submit" class="btn btn-primary">Submit request</button>

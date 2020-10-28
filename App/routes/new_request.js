@@ -1,6 +1,5 @@
 var express = require('express');
 var router = express.Router();
-var url = require('url');
 require('dotenv').config({path: __dirname + '/../.env'});
 
 const { Pool } = require('pg')
@@ -95,8 +94,9 @@ var petOwners;
 var careTakers;
 var s_date;
 var e_date;
+var transfer_type;
+var payment_method;
 var conflicts;
-var ct_id;
 
 /* Util */
 var getString = (date) => date.getFullYear() + "-" + (date.getMonth() + 1) + "-" + date.getDate();
@@ -134,6 +134,8 @@ var refreshPage = (res) => {
 		eDateErr: eDateErr,
 		dateConflictErr: dateConflictErr,
 		conflicts: conflicts,
+		transfer_type: transfer_type,
+		payment_method: payment_method
 	});
 }
 
@@ -185,6 +187,8 @@ router.post('/:userid/:petid', function(req, res, next) {
 	petid = req.params.petid;
 	s_date = new Date(req.body.s_date.trim());
 	e_date = new Date(req.body.e_date.trim());
+	transfer_type = req.body.transfer_type;
+	payment_method = req.body.payment_method;
 	if (s_date.toString() === 'Invalid Date') {
 		sDateErr = "* The start date format is not a valid date format.";
 		s_date = new Date();
@@ -209,7 +213,7 @@ router.post('/:userid/:petid', function(req, res, next) {
 	if (sDateErr !== "" || eDateErr !== "") {
 		refreshPage(res);
 	} else {
-		pool.query(conflicting_real_transactions_query, [petid, getString(s_date), getString(e_date)], (err, data) => {
+		/* pool.query(conflicting_real_transactions_query, [petid, getString(s_date), getString(e_date)], (err, data) => {
 			dateConflictErr = data.rows.length > 0 ? "* There are running transactions of the pet conflicting the input dates." : "";
 			if (dateConflictErr === "") {
 				pool.query(all_caretaker_query, [category, getString(s_date), getString(e_date), petid], (err, data) => {
@@ -222,7 +226,8 @@ router.post('/:userid/:petid', function(req, res, next) {
 			} else {
 				refreshPage(res);
 			}
-		})
+		}) */
+		refreshPage(res);
 	}
 });
 
