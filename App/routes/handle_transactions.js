@@ -47,7 +47,7 @@ var existing_transactions;
 /* Util */
 var getString = (date) => date.getFullYear() + "-" + (date.getMonth() + 1) + "-" + date.getDate();
 var refreshPage = (res) => {
-	res.render('new_transaction', {
+	res.render('handle_transactions', {
 		title: 'Find Care Taker for your ' + category + ' ' + petName,
 		petid: petid,
 		s_date: getString(s_date),
@@ -60,7 +60,7 @@ var refreshPage = (res) => {
 }
 var redirectHere = (res) => {
 	res.redirect(url.format({
-		pathname:"/new_transaction/" + userid + "/" + petid + "/" + getString(s_date),
+		pathname:"/handle_transactions/" + userid + "/" + petid + "/" + getString(s_date),
 		query: {
 			"allocate_unsuccessful": allocate_unsuccessful
 		}

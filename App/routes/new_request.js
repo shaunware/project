@@ -147,7 +147,7 @@ router.post('/:userid/:petid', function(req, res, next) {
 					if (err) {
 						console.log(err);
 					} else {
-						res.redirect('../../../new_transaction/' + userid + '/' + petid + '/' + getString(s_date));
+						res.redirect('../../../handle_transactions/' + userid + '/' + petid + '/' + getString(s_date));
 					}
 				})
 			}
