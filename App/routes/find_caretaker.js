@@ -134,7 +134,7 @@ var refreshPage = (res) => {
 		sDateErr: sDateErr,
 		eDateErr: eDateErr,
 		dateConflictErr: dateConflictErr,
-		conflicts: conflicts
+		conflicts: conflicts,
 	});
 }
 
@@ -260,4 +260,18 @@ router.post('/:userid/:petid/delete_pending/:ct_id', function(req, res, next) {
 	})
 });
 
+// SEND REQUEST
+router.post('/:userid/:petid/request/:ct_id', function(req, res, next) {
+	console.log(req.params.petid);
+	console.log(req.body.s_date_copy);
+	refreshPage(res);
+});
+
 module.exports = router;
+
+/*
+TODO:
+1. Filter/Sort
+2. Recommend anyhow
+3. Send request
+ */

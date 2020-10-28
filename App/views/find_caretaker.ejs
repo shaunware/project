@@ -24,9 +24,24 @@
 				b.innerText = "Show conflicting pending transactions";
 			}
 		  };
+		  const syncDate = () => {
+		  	document.getElementById("s_date_copy").value = document.getElementById("s_date").value;
+		  	document.getElementById("e_date_copy").value = document.getElementById("e_date").value;
+		  	console.log(document.getElementById("s_date").value);
+		  };
+		  const dummy = () => {
+		  	alert("hello");
+		  	//alert("pool:" + pool);
+			/*pool.query('SELECT * FROM PetCategories', (err, data) => {
+				alert("data:" +  data.rows.length);
+				document.getElementById("dummyoutput").innerText = err ? err : data;
+			});*/
+		  };
+		  const dummy2 = () => {alert("alert")};
 	  </script>
   </head>
   <body>
+    <p>date: </p>
     <h1><%= title%></h1>
 	<a href="../../test"><button class="btn btn-secondary">Edit pet profile</button></a> <!-- TODO: Change to actual edit path -->
 	<a href="../../test"><button class="btn btn-secondary">Back</button></a> <!-- TODO: Change to actual pets path -->
@@ -75,7 +90,7 @@
 		<% for (var i=0; i<conflicts.length; i++) { %>
 			<% var getString = (date) => date.getFullYear() + "-" + (date.getMonth() + 1) + "-" + date.getDate(); %>
 			<tr>
-				<form  action="<%=petid%>/delete_pending/<%=conflicts[i].ct_id%>" method="post">
+				<form  action="<%=petid%>/delete_pending/<%=conflicts[i].ct_id%>/<%=s_date%>/<%=e_date%>" method="post"> <!-- TODO: May need to update if :userid is not longer needed with session created -->
 					<td><%= getString(conflicts[i].s_date) %></td>
 					<td><%= getString(conflicts[i].e_date) %></td>
 					<td><%= conflicts[i].ct_id %></td>
@@ -104,13 +119,19 @@
 		<tbody>
 		<% for (var i=0; i<careTakers.length; i++) { %>
 			<tr>
-				<td><%= careTakers[i].userid %></td>
-				<td><%= careTakers[i].name %></td>
-				<td><%= careTakers[i].rating %></td>
-				<td><%= careTakers[i].category %></td>
-				<td><%= careTakers[i].daily_price %></td>
-				<td><a href="../../test" target="_blank"><button class="btn btn-primary">View</button></a></td> <!-- TODO: Change to actual view path -->
-				<td><a><button class="btn btn-primary">Request</button></a></td> <!-- TODO: Should be an action that posts -->
+				<form id="request_form" action="request/<%=careTakers[i].userid%>%>" method="post" role="form"> <!-- TODO: May need to update if :userid is not longer needed with session created -->
+					<div id="dates_copy" >
+						<input id="s_date_copy" type="text" form="request_form">
+						<input id="e_date_copy" type="text" form="request_form">
+					</div>
+					<td><%= careTakers[i].userid %></td>
+					<td><%= careTakers[i].name %></td>
+					<td><%= careTakers[i].rating %></td>
+					<td><%= careTakers[i].category %></td>
+					<td><%= careTakers[i].daily_price %></td>
+					<td><a href="../../test" target="_blank"><button class="btn btn-primary">View</button></a></td> <!-- TODO: Change to actual view path -->
+					<td><button form="request_form" type="submit" onmouseover="syncDate()" class="btn btn-primary">Request</button></td> <!-- TODO: Should be an action that posts -->
+				</form>
 			</tr>
 		<% } %>
 		</tbody>
