@@ -20,6 +20,14 @@ SELECT T.ct_id AS ct_id, T.cost AS cost, C.rating AS rating, T.status AS status,
   FROM Transactions T INNER JOIN CareTakers C ON T.ct_id=C.userid
   WHERE T.pet_id={$1=this petid} AND T.s_date={$2=this s_date} AND T.status<>'Withdrawn'
  */
+var allocate_query = 'SELECT allocate_success($1, $2, $3)';
+/*
+SELECT CTC.ct_id
+  FROM CanTakeCare CTC
+  WHERE category={$1=this category}
+    AND is_available(ct_id, {$2=s_date},{$3=e_date})
+    AND CTC.ct_id=ANY(SELECT userid FROM FullTimeCareTakers)
+ */
 
 /* Data */
 var userid;
@@ -45,6 +53,15 @@ var refreshPage = (res) => {
 		payment_method: payment_method,
 		existing_transactions: existing_transactions
 	});
+}
+var redirectHere = (res) => {
+	res.redirect(url.format({
+		pathname:"/new_transaction/" + userid + "/" + petid + "/" + getString(s_date),
+		query: {
+			"s_date": getString(s_date),
+			"e_date": getString(e_date)
+		}
+	}));
 }
 
 /* Err msg */
@@ -93,8 +110,19 @@ router.get('/:userid/:petid/:s_date', function(req, res, next) {
 
 // POST
 // SELECT
-router.post('/:userid/:petid', function(req, res, next) {
-
+router.post('/:userid/:petid/:s_date/allocate', function(req, res, next) {
+	userid = req.params.userid;
+	petid = req.params.petid;
+	s_date = new Date(req.params.s_date);
+	pool.query(allocate_query, [petid, getString(s_date), getString(e_date)], (err, data) => {
+		console.log(data.rows[0].allocate_success);
+		if (data.rows[0].allocate_success) {
+			console.log("Allocated the a full-time care taker for request of petid from " + getString(s_date) + " to " + getString(e_date));
+			res.redirect('/test'); // TODO: Should direct to the view request page.
+		} else {
+			redirectHere(res);
+		}
+	})
 });
 
 module.exports = router;

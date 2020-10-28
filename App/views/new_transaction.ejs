@@ -36,7 +36,7 @@
 		<p><b>Start date: </b><%= s_date%><span style="padding-left: 30px"></span><b>End date: </b><%= e_date%></p>
 		<p><b>Transfer type: </b><%= transfer_type%><span style="padding-left: 30px"></span> <b>Payment method: </b><%= payment_method%></p>
 	</div>
-	<div id="existing-list"> <!-- TODO: Should fill in with actual data -->
+	<div id="existing-list">
 		<table class="table">
 			<thead>
 				<tr><th scope="colgroup" colspan="6">Requests submitted</th></tr>
@@ -57,14 +57,14 @@
 					<td><%= existing_transactions[i].rating%></td>
 					<td><%= existing_transactions[i].cost%></td>
 					<td><%= existing_transactions[i].status%></td>
-					<td><button type="button" class="btn btn-secondary" <%= existing_transactions[i].status === 'Declined' ? 'disabled' : ''%>>Withdraw</button></td>
+					<td><button type="button" class="btn btn-secondary" <%= existing_transactions[i].status === 'Declined' ? 'disabled' : ''%>>Withdraw</button></td> <!-- TODO: Handle withdraw -->
 				</tr>
 			<% } %>
 			</tbody>
 		</table>
 	</div>
     <form id="html_form" role="form" method="post">
-		<button type="submit" class="btn btn-primary">Allocate any care taker to me</button> <!-- TODO: Should be handled with a form and post method -->
+		<button type="submit" class="btn btn-primary" formaction="<%=s_date%>/allocate">Allocate any care taker to me</button> <!-- TODO: Should be handled with a form and post method -->
 		<button type="submit" class="btn btn-primary">Send request to all care takers in the filtered list</button> <!-- TODO: Should be handled with a form and post method -->
 		<button type="button" class="btn btn-primary" id="show-filter-btn" onclick="toggleFilter()">Show filter/sort panel</button>
 		<div id="filter-panel" style="display: none">
