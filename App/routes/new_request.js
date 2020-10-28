@@ -9,7 +9,8 @@ const pool = new Pool({connectionString:process.env.DATABASE_URL})
 var all_petowner_query = 'SELECT userid FROM PetOwners';
 var petowner_exist_query = 'SELECT 1 FROM PetOwners WHERE userid=$1'
 var pet_exist_query = 'SELECT * FROM Pets WHERE petid=$1 AND owner=$2';
-var conflicting_query = 'SELECT * FROM Requests WHERE pet_id=$1 AND are_conflicting_periods(s_date, e_date, $2, $3)';
+var conflicting_query = 'SELECT s_date, e_date FROM Requests WHERE pet_id=$1 AND are_conflicting_periods(s_date, e_date, $2, $3)';
+var submit_request_query = 'INSERT INTO Requests VALUES ($1, $2, $4, $5, $3)'
 
 /* Data */
 var userid;
@@ -137,12 +138,18 @@ router.post('/:userid/:petid', function(req, res, next) {
 		refreshPage(res);
 	} else {
 		pool.query(conflicting_query, [petid, getString(s_date), getString(e_date)], (err, data) => {
-			dateConflictErr = data.rows.length > 0 ? "* There are requests conflicting with this request of the pet." : "";
-			console.log(data.rows);
-			if (dateConflictErr === "") {
+			if (data.rows.length > 0) {
+				dateConflictErr = "* There is conflicting request from " + getString(data.rows[0].s_date) + " to " + getString(data.rows[0].e_date) + ".";
 				refreshPage(res);
 			} else {
-				refreshPage(res);
+				dateConflictErr = "";
+				pool.query(submit_request_query, [petid, getString(s_date), getString(e_date), transfer_type, payment_method], (err, data) => {
+					if (err) {
+						console.log(err);
+					} else {
+						res.redirect('../../../test');
+					}
+				})
 			}
 		})
 	}
@@ -150,9 +157,3 @@ router.post('/:userid/:petid', function(req, res, next) {
 
 module.exports = router;
 
-/*
-TODO:
-1. Filter/Sort
-2. Recommend anyhow
-3. Send request
- */
