@@ -123,12 +123,11 @@ var isIn2Years = d => {
 	return compareDates(d, d1) < 0;
 }
 var refreshPage = (res) => {
-	res.render('find_caretaker', {
+	res.render('new_request', {
 		title: 'Find Care Taker for ' + petName,
 		petid: petid,
 		category: category,
 		requirements: requirements,
-		careTakers: careTakers,
 		s_date: getString(s_date),
 		e_date: getString(e_date),
 		sDateErr: sDateErr,
@@ -139,61 +138,45 @@ var refreshPage = (res) => {
 }
 
 /* Err msg */
-var connectionSuccess;
-var isPetOwner;
-var isValidPet;
 var sDateErr = "";
 var eDateErr = "";
 var dateConflictErr = "";
 
 // GET
 router.get('/:userid/:petid', function(req, res, next) {
-	s_date = req.query.s_date ? new Date(req.query.s_date) : new Date();
-	if (req.query.e_date) {
-		e_date = new Date(req.query.e_date);
-	} else {
-		e_date = new Date(s_date);
-		e_date.setDate(s_date.getDate() + 7);
-	}
+	s_date = new Date();
+	e_date = new Date(s_date);
+	e_date.setDate(s_date.getDate() + 7);
 	userid = req.params.userid; //TODO: May need to update with session user id
 	petid = req.params.petid;
-	pool.query(all_petowner_query, (err, data) => {
+	refreshPage(res);
+	/* pool.query(all_petowner_query, (err, data) => {
 		if (err !== undefined) {
-			connectionSuccess = false;
-		} else {
-			connectionSuccess = true;
-			petOwners = data.rows;
-		}
-		if (connectionSuccess) {
-			pool.query(petowner_exist_query, [userid], (err, data) => {
-				isPetOwner = data.rows.length > 0;
-			});
-			if (isPetOwner) {
-				pool.query(pet_exist_query, [petid, userid], (err, data) => {
-					isValidPet = data.rows.length > 0;
-					pet = data.rows;
-				})
-				if (isValidPet) {
-					petName = pet[0].name;
-					category = pet[0].category;
-					requirements = pet[0].requirements;
-					pool.query(all_caretaker_query, [category, getString(s_date), getString(e_date), petid], (err, data) => {
-						careTakers = data.rows;
-						pool.query(conflicting_transactions_query, [petid, getString(s_date), getString(e_date)], (err, data) => {
-							conflicts = data.rows;
-							refreshPage(res);
-						});
-					});
-				} else {
-					res.render('not_found_error', {component: 'petid'});
-				}
-			} else {
-				res.render('not_found_error', {component: 'userid'});
-			}
-		} else {
 			res.render('connection_error');
+		} else {
+			petOwners = data.rows;
+			pool.query(petowner_exist_query, [userid], (err, data) => {
+				if (data.rows.length > 0) {
+					pool.query(pet_exist_query, [petid, userid], (err, data) => {
+						if (data.rows.length > 0) {
+							pet = data.rows;
+							petName = pet[0].name;
+							category = pet[0].category;
+							requirements = pet[0].requirements;
+							pool.query(conflicting_transactions_query, [petid, getString(s_date), getString(e_date)], (err, data) => {
+								conflicts = data.rows;
+								refreshPage(res);
+							});
+						} else {
+							res.render('not_found_error', {component: 'petid'});
+						}
+					})
+				} else {
+					res.render('not_found_error', {component: 'userid'});
+				}
+			});
 		}
-	});
+	}); */
 });
 
 // POST
