@@ -30,6 +30,7 @@ SELECT CTC.ct_id
     AND CTC.ct_id=ANY(SELECT userid FROM FullTimeCareTakers)
  */
 var delete_request_query = 'DELETE FROM Requests WHERE pet_id=$1 AND s_date=$2';
+var delete_empty_request_qeury = 'CALL delete_empty_request($1, $2)';
 
 /* Data */
 var userid;
@@ -61,8 +62,6 @@ var redirectHere = (res) => {
 	res.redirect(url.format({
 		pathname:"/new_transaction/" + userid + "/" + petid + "/" + getString(s_date),
 		query: {
-			"s_date": getString(s_date),
-			"e_date": getString(e_date),
 			"allocate_unsuccessful": allocate_unsuccessful
 		}
 	}));
@@ -144,6 +143,17 @@ router.post('/:userid/:petid/:s_date/delete', function (req, res, next) {
 		res.redirect('/test'); //TODO: Redirect to the view pet page
 	})
 });
+
+// BACK
+router.post('/:userid/:petid/:s_date/back', function (req, res, next) {
+	userid = req.params.userid;
+	petid = req.params.petid;
+	s_date = new Date(req.params.s_date);
+	pool.query(delete_empty_request_qeury, [petid, s_date], (err, data) => {
+		console.log(err);
+		res.redirect('/test'); //TODO: Redirect to the view request page
+	})
+})
 
 module.exports = router;
 

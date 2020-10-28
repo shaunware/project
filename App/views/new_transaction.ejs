@@ -29,9 +29,9 @@
   <body>
     <h1><%= title%></h1>
 	<a href="../../../test"><button class="btn btn-secondary">Edit request</button></a> <!-- TODO: Change to actual edit path -->
-	<button class="btn btn-secondary" form="html_form" formaction="<%=s_date%>/delete">Delete request</button> <!-- TODO: Should be handled with a form and post method -->
-	<button class="btn btn-secondary">Back</button> <!-- TODO: Handle with form submit to check if empty -->
-    <br /><br />
+	<button class="btn btn-secondary" form="html_form" formaction="<%=s_date%>/delete">Delete request</button>
+	<button class="btn btn-secondary" form="html_form" formaction="<%=s_date%>/back">Back</button> <!-- TODO: Handle with form submit to check if empty -->
+	<br /><br />
 	<div id="request-info">
 		<p><b>Start date: </b><%= s_date%><span style="padding-left: 30px"></span><b>End date: </b><%= e_date%></p>
 		<p><b>Transfer type: </b><%= transfer_type%><span style="padding-left: 30px"></span> <b>Payment method: </b><%= payment_method%></p>
