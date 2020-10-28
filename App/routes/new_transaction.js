@@ -50,7 +50,7 @@ var isIn2Years = d => {
 	return compareDates(d, d1) <= 0;
 }
 var refreshPage = (res) => {
-	res.render('new_request', {
+	res.render('new_transaction', {
 		title: 'Find Care Taker for ' + petName,
 		petid: petid,
 		category: category,
@@ -71,12 +71,10 @@ var eDateErr = "";
 var dateConflictErr = "";
 
 // GET
-router.get('/:userid/:petid', function(req, res, next) {
-	s_date = new Date();
-	e_date = new Date(s_date);
-	e_date.setDate(s_date.getDate() + 7);
+router.get('/:userid/:petid/:s_date', function(req, res, next) {
 	userid = req.params.userid; //TODO: May need to update with session user id
 	petid = req.params.petid;
+	s_date = req.params.s_date;
 	pool.query(all_petowner_query, (err, data) => {
 		if (err !== undefined) {
 			res.render('connection_error');
@@ -147,7 +145,7 @@ router.post('/:userid/:petid', function(req, res, next) {
 					if (err) {
 						console.log(err);
 					} else {
-						res.redirect('../../../new_transaction/' + userid + '/' + petid + '/' + getString(s_date));
+						res.redirect('../../../test');
 					}
 				})
 			}
