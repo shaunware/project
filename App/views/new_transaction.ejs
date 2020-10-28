@@ -17,5 +17,33 @@
   </head>
   <body>
     <h1><%= title%></h1>
+	<a href="../../../test"><button class="btn btn-secondary">Edit request</button></a> <!-- TODO: Change to actual edit path -->
+	<button class="btn btn-secondary">Delete request</button> <!-- TODO: Should be handled with a form and post method -->
+	<button class="btn btn-secondary">Back</button> <!-- TODO: Handle with form submit to check if empty -->
+    <br /><br />
+	<div id="request-info">
+		<p><b>Start date: </b><%= s_date%><span style="padding-left: 30px"></span><b>End date: </b><%= e_date%></p>
+		<p><b>Transfer type: </b><%= transfer_type%><span style="padding-left: 30px"></span> <b>Payment method: </b><%= payment_method%></p>
+	</div>
+	<div id="existing-list"> <!-- TODO: Should fill in with actual data -->
+		<table class="table">
+			<thead>
+				<tr><th scope="colgroup" colspan="5">Requests submitted</th></tr>
+				<tr>
+					<th scope="col">Care Taker ID</th>
+					<th scope="col">Category</th>
+					<th scope="col">Daily price</th>
+					<th scope="col">Status</th>
+					<th scope="col"><!-- Withdraw --></th>
+				</tr>
+			</thead>
+			<tbody></tbody>
+		</table>
+	</div>
+    <form id="html_form" role="form" method="post">
+		<button type="submit" class="btn btn-primary">Allocate any care taker to me</button> <!-- TODO: Should be handled with a form and post method -->
+		<button type="submit" class="btn btn-primary">Send request to all care takers in the filtered list</button> <!-- TODO: Should be handled with a form and post method -->
+		<button type="button" class="btn btn-primary">Show filter/sort panel</button> <!-- TODO: Should allow toggle -->
+	</form>
   </body>
 </html>

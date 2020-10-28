@@ -50,14 +50,10 @@ var isIn2Years = d => {
 }
 var refreshPage = (res) => {
 	res.render('new_transaction', {
-		title: 'Find Care Taker for ' + petName,
+		title: 'Find Care Taker for your ' + category + ' ' + petName,
 		petid: petid,
-		category: category,
 		s_date: getString(s_date),
 		e_date: getString(e_date),
-		sDateErr: sDateErr,
-		eDateErr: eDateErr,
-		dateConflictErr: dateConflictErr,
 		transfer_type: transfer_type,
 		payment_method: payment_method
 	});
@@ -89,7 +85,7 @@ router.get('/:userid/:petid/:s_date', function(req, res, next) {
 									var request = data.rows[0];
 									e_date = request.e_date;
 									transfer_type = request.transfer_type;
-									payment_method = request.payment_method;
+									payment_method = request.payment_type;
 									console.log('success');
 									refreshPage(res);
 								} else {
@@ -111,53 +107,7 @@ router.get('/:userid/:petid/:s_date', function(req, res, next) {
 // POST
 // SELECT
 router.post('/:userid/:petid', function(req, res, next) {
-	userid = req.params.userid;
-	petid = req.params.petid;
-	s_date = new Date(req.body.s_date.trim());
-	e_date = new Date(req.body.e_date.trim());
-	transfer_type = req.body.transfer_type;
-	payment_method = req.body.payment_method;
-	if (s_date.toString() === 'Invalid Date') {
-		sDateErr = "* The start date format is not a valid date format.";
-		s_date = new Date();
-	} else if (compareDates(s_date, new Date()) < 0) {
-		sDateErr = "* The start date should not be a date before today.";
-	} else if (!isIn2Years(s_date)) {
-		sDateErr = "* The start date should be within 2 years.";
-	} else {
-		sDateErr = "";
-	}
-	if (e_date.toString() === 'Invalid Date') {
-		eDateErr = "* The end date format is not a valid date format.";
-		e_date = new Date(s_date);
-		e_date.setDate(s_date.getDate() + 7);
-	} else if (compareDates(e_date, s_date) < 0) {
-		eDateErr = "* The end date should be a date after start date.";
-	} else if (!isIn2Years(e_date)) {
-		eDateErr = "* The end date should be within 2 years.";
-	} else {
-		eDateErr = "";
-	}
-	if (sDateErr !== "" || eDateErr !== "") {
-		dateConflictErr = "";
-		refreshPage(res);
-	} else {
-		pool.query(conflicting_query, [petid, getString(s_date), getString(e_date)], (err, data) => {
-			if (data.rows.length > 0) {
-				dateConflictErr = "* There is conflicting request from " + getString(data.rows[0].s_date) + " to " + getString(data.rows[0].e_date) + ".";
-				refreshPage(res);
-			} else {
-				dateConflictErr = "";
-				pool.query(submit_request_query, [petid, getString(s_date), getString(e_date), transfer_type, payment_method], (err, data) => {
-					if (err) {
-						console.log(err);
-					} else {
-						res.redirect('../../../test');
-					}
-				})
-			}
-		})
-	}
+
 });
 
 module.exports = router;
