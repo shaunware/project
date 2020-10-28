@@ -28,16 +28,28 @@
 	<div id="existing-list"> <!-- TODO: Should fill in with actual data -->
 		<table class="table">
 			<thead>
-				<tr><th scope="colgroup" colspan="5">Requests submitted</th></tr>
+				<tr><th scope="colgroup" colspan="6">Requests submitted</th></tr>
 				<tr>
 					<th scope="col">Care Taker ID</th>
 					<th scope="col">Category</th>
-					<th scope="col">Daily price</th>
+					<th scope="col">Average Rating</th>
+					<th scope="col">Cost</th>
 					<th scope="col">Status</th>
 					<th scope="col"><!-- Withdraw --></th>
 				</tr>
 			</thead>
-			<tbody></tbody>
+			<tbody>
+			<% for (var i=0; i<existing_transactions.length; i++) { %>
+				<tr>
+					<td><%= existing_transactions[i].ct_id%></td>
+					<td><%= existing_transactions[i].ct_category%></td>
+					<td><%= existing_transactions[i].rating%></td>
+					<td><%= existing_transactions[i].cost%></td>
+					<td><%= existing_transactions[i].status%></td>
+					<td><button type="button" class="btn btn-secondary" <%= existing_transactions[i].status === 'Declined' ? 'disabled' : ''%>>Withdraw</button></td>
+				</tr>
+			<% } %>
+			</tbody>
 		</table>
 	</div>
     <form id="html_form" role="form" method="post">
