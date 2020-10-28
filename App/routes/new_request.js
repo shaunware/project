@@ -9,79 +9,7 @@ const pool = new Pool({connectionString:process.env.DATABASE_URL})
 var all_petowner_query = 'SELECT userid FROM PetOwners';
 var petowner_exist_query = 'SELECT 1 FROM PetOwners WHERE userid=$1'
 var pet_exist_query = 'SELECT * FROM Pets WHERE petid=$1 AND owner=$2';
-var all_caretaker_query = 'SELECT ct.userid AS userid, name, rating, daily_price,\n' +
-	'       CASE\n' +
-	'           WHEN EXISTS(SELECT 1 FROM FullTimeCareTakers fct WHERE fct.userid=ct.userid) THEN \'Full-time\'\n' +
-	'           ELSE \'Part-Time\'\n' +
-	'           END\n' +
-	'       AS category\n' +
-	'FROM ((SELECT userid, rating\n' +
-	'      FROM CareTakers\n' +
-	'      WHERE NOT EXISTS(SELECT 1 FROM CannotTakeCare WHERE ct_id=userid AND category=$1)) ct\n' +
-	'    NATURAL JOIN (SELECT userid, name FROM Users) us)\n' +
-	'    LEFT JOIN (SELECT ct_id, daily_price FROM CanTakeCare) ctc ON ct.userid=ctc.ct_id\n' +
-	'WHERE EXISTS(\n' +
-	'    SELECT 1 FROM PeriodsAvailable pa\n' +
-	'    WHERE pa.ct_id=ct.userid\n' +
-	'      AND s_date<=$2\n' +
-	'      AND e_date>=$3\n' +
-	'          )\n' +
-	'  AND NOT EXISTS(\n' +
-	'      SELECT 1 FROM Transactions t\n' +
-	'      WHERE t.pet_id=$4\n' +
-	'        AND t.ct_id=ct.userid\n' +
-	'        AND ((t.e_date>=$2 AND t.e_date<=$3) OR t.s_date<=$3)\n' +
-	'    );' //all caretakers can take care of this category of pet at this period of time and no conflicting transaction exists
-/*
-all_caretaker_query =
-SELECT ct.userid AS userid, name, rating, daily_price,
-       CASE
-           WHEN EXISTS(SELECT 1 FROM FullTimeCareTakers fct WHERE fct.userid=ct.userid) THEN 'Full-time'
-           ELSE 'Part-Time'
-           END
-       AS category
-FROM ((SELECT userid, rating
-      FROM CareTakers
-      WHERE NOT EXISTS(SELECT 1 FROM CannotTakeCare WHERE ct_id=userid AND category=$1)) ct
-    NATURAL JOIN (SELECT userid, name FROM Users) us)
-    LEFT JOIN (SELECT ct_id, daily_price FROM CanTakeCare) ctc ON ct.userid=ctc.ct_id
-WHERE EXISTS(
-    SELECT 1 FROM PeriodsAvailable pa
-    WHERE pa.ct_id=ct.userid
-      AND s_date<=$2
-      AND e_date>=$3
-          )
-  AND NOT EXISTS(
-      SELECT 1 FROM Transactions t
-      WHERE t.pet_id=$4
-        AND t.ct_id=ct.userid
-        AND ((t.e_date>=$2 AND t.e_date<=$3) OR t.s_date<=$3)
-    );
- */
-var conflicting_transactions_query = 'SELECT s_date, e_date, ct_id\n' +
-	'  FROM Transactions\n' +
-	'  WHERE pet_id=$1\n' +
-	'    AND ((e_date>=$2 AND e_date<=$3) OR s_date<=$3)'; // real transactions are excluded before calling this query by error checking
-/*
-SELECT s_date, e_date, ct_id
-  FROM Transactions
-  WHERE pet_id=$1
-    AND ((e_date>=$2 AND e_date<=$3) OR s_date<=$3)
- */
-var conflicting_real_transactions_query = 'SELECT 1 FROM RealTransactions\n' +
-	'  WHERE pet_id=$1\n' +
-	'  AND ((e_date>=$2 AND e_date<=$3) OR s_date<=$3)';
-/*
-SELECT 1 FROM RealTransactions
-  WHERE pet_id=$1
-  AND ((e_date>=$2 AND e_date<=$3) OR s_date<=$3)
- */
-var delete_pending_query = 'DELETE FROM Transactions WHERE\n' +
-	'  ct_id=$4 AND (s_date, e_date, ct_id) IN (' + conflicting_transactions_query + ')';
-/*
-DELETE FROM Transactions WHERE
-  ct_id=$4 AND (s_date, e_date, ct_id) IN conflicting_transactions_query
- */
+var conflicting_query = 'SELECT * FROM Requests WHERE pet_id=$1 AND are_conflicting_periods(s_date, e_date, $2, $3)';
 
 /* Data */
 var userid;
@@ -91,12 +19,10 @@ var petName;
 var category;
 var requirements;
 var petOwners;
-var careTakers;
 var s_date;
 var e_date;
 var transfer_type;
 var payment_method;
-var conflicts;
 
 /* Util */
 var getString = (date) => date.getFullYear() + "-" + (date.getMonth() + 1) + "-" + date.getDate();
@@ -119,8 +45,8 @@ var compareDates = (d1, d2) => {
 }
 var isIn2Years = d => {
 	var d1 = new Date();
-	d1.setFullYear(d.getFullYear() + 2);
-	return compareDates(d, d1) < 0;
+	d1.setFullYear(d1.getFullYear() + 2);
+	return compareDates(d, d1) <= 0;
 }
 var refreshPage = (res) => {
 	res.render('new_request', {
@@ -133,7 +59,6 @@ var refreshPage = (res) => {
 		sDateErr: sDateErr,
 		eDateErr: eDateErr,
 		dateConflictErr: dateConflictErr,
-		conflicts: conflicts,
 		transfer_type: transfer_type,
 		payment_method: payment_method
 	});
@@ -151,8 +76,7 @@ router.get('/:userid/:petid', function(req, res, next) {
 	e_date.setDate(s_date.getDate() + 7);
 	userid = req.params.userid; //TODO: May need to update with session user id
 	petid = req.params.petid;
-	refreshPage(res);
-	/* pool.query(all_petowner_query, (err, data) => {
+	pool.query(all_petowner_query, (err, data) => {
 		if (err !== undefined) {
 			res.render('connection_error');
 		} else {
@@ -165,10 +89,7 @@ router.get('/:userid/:petid', function(req, res, next) {
 							petName = pet[0].name;
 							category = pet[0].category;
 							requirements = pet[0].requirements;
-							pool.query(conflicting_transactions_query, [petid, getString(s_date), getString(e_date)], (err, data) => {
-								conflicts = data.rows;
-								refreshPage(res);
-							});
+							refreshPage(res);
 						} else {
 							res.render('not_found_error', {component: 'petid'});
 						}
@@ -178,12 +99,13 @@ router.get('/:userid/:petid', function(req, res, next) {
 				}
 			});
 		}
-	}); */
+	});
 });
 
 // POST
 // SELECT
 router.post('/:userid/:petid', function(req, res, next) {
+	userid = req.params.userid;
 	petid = req.params.petid;
 	s_date = new Date(req.body.s_date.trim());
 	e_date = new Date(req.body.e_date.trim());
@@ -211,48 +133,19 @@ router.post('/:userid/:petid', function(req, res, next) {
 		eDateErr = "";
 	}
 	if (sDateErr !== "" || eDateErr !== "") {
+		dateConflictErr = "";
 		refreshPage(res);
 	} else {
-		/* pool.query(conflicting_real_transactions_query, [petid, getString(s_date), getString(e_date)], (err, data) => {
-			dateConflictErr = data.rows.length > 0 ? "* There are running transactions of the pet conflicting the input dates." : "";
+		pool.query(conflicting_query, [petid, getString(s_date), getString(e_date)], (err, data) => {
+			dateConflictErr = data.rows.length > 0 ? "* There are requests conflicting with this request of the pet." : "";
+			console.log(data.rows);
 			if (dateConflictErr === "") {
-				pool.query(all_caretaker_query, [category, getString(s_date), getString(e_date), petid], (err, data) => {
-					careTakers = data.rows;
-					pool.query(conflicting_transactions_query, [petid, getString(s_date), getString(e_date)], (err, data) => {
-						conflicts = data.rows;
-						refreshPage(res);
-					});
-				});
+				refreshPage(res);
 			} else {
 				refreshPage(res);
 			}
-		}) */
-		refreshPage(res);
+		})
 	}
-});
-
-// DELETE PENDING
-router.post('/:userid/:petid/delete_pending/:ct_id', function(req, res, next) {
-	userid = req.params.userid;
-	petid = req.params.petid;
-	ct_id = req.params.ct_id;
-	pool.query(delete_pending_query, [petid, getString(s_date), getString(e_date), ct_id], (err, data) => {
-		console.log("Deleted the conflicting pending transaction");
-		res.redirect(url.format({
-			pathname:"/find_caretaker/" + userid + "/" + petid,
-			query: {
-				"s_date": getString(s_date),
-				"e_date": getString(e_date)
-			}
-		}));
-	})
-});
-
-// SEND REQUEST
-router.post('/:userid/:petid/request/:ct_id', function(req, res, next) {
-	console.log(req.params.petid);
-	console.log(req.body.s_date_copy);
-	refreshPage(res);
 });
 
 module.exports = router;
