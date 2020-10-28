@@ -29,6 +29,7 @@ SELECT CTC.ct_id
     AND is_available(ct_id, {$2=s_date},{$3=e_date})
     AND CTC.ct_id=ANY(SELECT userid FROM FullTimeCareTakers)
  */
+var delete_request_query = 'DELETE FROM Requests WHERE pet_id=$1 AND s_date=$2';
 
 /* Data */
 var userid;
@@ -115,7 +116,7 @@ router.get('/:userid/:petid/:s_date', function(req, res, next) {
 });
 
 // POST
-// SELECT
+// ALLOCATE
 router.post('/:userid/:petid/:s_date/allocate', function(req, res, next) {
 	userid = req.params.userid;
 	petid = req.params.petid;
@@ -130,6 +131,17 @@ router.post('/:userid/:petid/:s_date/allocate', function(req, res, next) {
 			allocate_unsuccessful = true;
 			redirectHere(res);
 		}
+	})
+});
+
+// DELETE REQUEST
+router.post('/:userid/:petid/:s_date/delete', function (req, res, next) {
+	userid = req.params.userid;
+	petid = req.params.petid;
+	s_date = new Date(req.params.s_date);
+	pool.query(delete_request_query, [petid, s_date], (err, data) => {
+		console.log("Deleted the query and all transactions of " + petid + " on " + getString(s_date));
+		res.redirect('/test'); //TODO: Redirect to the view pet page
 	})
 });
 

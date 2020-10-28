@@ -29,7 +29,7 @@
   <body>
     <h1><%= title%></h1>
 	<a href="../../../test"><button class="btn btn-secondary">Edit request</button></a> <!-- TODO: Change to actual edit path -->
-	<button class="btn btn-secondary">Delete request</button> <!-- TODO: Should be handled with a form and post method -->
+	<button class="btn btn-secondary" form="html_form" formaction="<%=s_date%>/delete">Delete request</button> <!-- TODO: Should be handled with a form and post method -->
 	<button class="btn btn-secondary">Back</button> <!-- TODO: Handle with form submit to check if empty -->
     <br /><br />
 	<div id="request-info">
