@@ -16,7 +16,6 @@
 	  </script>
   </head>
   <body>
-    <p>date: </p>
     <h1><%= title%></h1>
 	<a href="../../../test"><button class="btn btn-secondary">Edit pet profile</button></a> <!-- TODO: Change to actual edit path -->
 	<a href="../../../test"><button class="btn btn-secondary">Back</button></a> <!-- TODO: Change to actual pets path -->
@@ -29,9 +28,8 @@
 		<div class="form-group" id="date-specification">
 			<label for="s_date">Start Date</label>
 			<input type="text" class="form-control" id="s_date" name="s_date" value=<%= s_date%> >
-			<label for="e_date">End Date</label>
+			<label for="e_date" style="padding-left: 20px">End Date</label>
 			<input type="text" class="form-control" id="e_date" name="e_date" value=<%= e_date%> >
-			<button type="submit" class="btn btn-primary">Find care takers</button>
 			<% if (sDateErr !== "") { %>
 				<br />
 				<small id="sDateErr" class="err"><%= sDateErr%></small>
@@ -45,6 +43,20 @@
 				<small id="dateConflictErr" class="err"><%= dateConflictErr%></small>
 			<% } %>
 		</div>
+		<div class="form-group" id="transfer-type-specification">
+			<label for="transfer_type">Transfer type: </label>
+			<select class="form-control" id="transfer_type" name="transfer_type" style="width: 150px; display: inline-flex">
+				<option value="deliver">deliver</option>
+				<option value="pick-up">pick-up</option>
+				<option value="building">transfer at the PSC building</option>
+			</select>
+			<label for="payment_method" style="padding-left: 30px">Payment method: </label>
+			<select class="form-control" id="payment_method" name="payment_method" style="width: 150px; display: inline-flex">
+				<option value="card">card</option>
+				<option value="cash">cash</option>
+			</select>
+		</div>
+		<button type="submit" class="btn btn-primary">Submit request</button>
 	</form>
   </body>
 </html>
