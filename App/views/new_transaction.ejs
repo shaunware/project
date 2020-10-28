@@ -67,6 +67,10 @@
 		<button type="submit" class="btn btn-primary" formaction="<%=s_date%>/allocate">Allocate any care taker to me</button> <!-- TODO: Should be handled with a form and post method -->
 		<button type="submit" class="btn btn-primary">Send request to all care takers in the filtered list</button> <!-- TODO: Should be handled with a form and post method -->
 		<button type="button" class="btn btn-primary" id="show-filter-btn" onclick="toggleFilter()">Show filter/sort panel</button>
+		<% if (allocate_unsuccessful_msg !== "") { %>
+			<br />
+			<small id="allocate_unsuccessful_msg" class="err"><%= allocate_unsuccessful_msg%></small>
+		<% } %>
 		<div id="filter-panel" style="display: none">
 			<p>here</p>
 		</div>

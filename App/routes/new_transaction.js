@@ -1,5 +1,6 @@
 var express = require('express');
 var router = express.Router();
+var url = require('url');
 require('dotenv').config({path: __dirname + '/../.env'});
 
 const { Pool } = require('pg')
@@ -51,7 +52,8 @@ var refreshPage = (res) => {
 		e_date: getString(e_date),
 		transfer_type: transfer_type,
 		payment_method: payment_method,
-		existing_transactions: existing_transactions
+		existing_transactions: existing_transactions,
+		allocate_unsuccessful_msg: allocate_unsuccessful_msg(category)
 	});
 }
 var redirectHere = (res) => {
@@ -59,18 +61,22 @@ var redirectHere = (res) => {
 		pathname:"/new_transaction/" + userid + "/" + petid + "/" + getString(s_date),
 		query: {
 			"s_date": getString(s_date),
-			"e_date": getString(e_date)
+			"e_date": getString(e_date),
+			"allocate_unsuccessful": allocate_unsuccessful
 		}
 	}));
 }
 
 /* Err msg */
+var allocate_unsuccessful = false;
+var allocate_unsuccessful_msg = (category) => allocate_unsuccessful ? "* Sorry we cannot find any full-time care taker available declared " + category + " as a pet category that he or she can take care of." : "";
 
 // GET
 router.get('/:userid/:petid/:s_date', function(req, res, next) {
 	userid = req.params.userid; //TODO: May need to update with session user id
 	petid = req.params.petid;
 	s_date = new Date(req.params.s_date);
+	allocate_unsuccessful = req.query.allocate_unsuccessful;
 	pool.query(all_petowner_query, (err, data) => {
 		if (err !== undefined) {
 			res.render('connection_error');
@@ -118,8 +124,10 @@ router.post('/:userid/:petid/:s_date/allocate', function(req, res, next) {
 		console.log(data.rows[0].allocate_success);
 		if (data.rows[0].allocate_success) {
 			console.log("Allocated the a full-time care taker for request of petid from " + getString(s_date) + " to " + getString(e_date));
+			allocate_unsuccessful = false;
 			res.redirect('/test'); // TODO: Should direct to the view request page.
 		} else {
+			allocate_unsuccessful = true;
 			redirectHere(res);
 		}
 	})
