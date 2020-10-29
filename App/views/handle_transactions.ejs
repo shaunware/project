@@ -19,11 +19,47 @@
 		  	if (f.style.display === "none") {
 		  		f.style.display = "block";
 		  		b.innerText = "Hide filter/sort panel";
+				document.getElementById("toggle_filter").value = "block";
 			} else {
 		  		f.style.display = "none";
 		  		b.innerText = "Show filter/sort panel";
+				document.getElementById("toggle_filter").value = "none";
 			}
 		  }
+		  const toggleExperienceIn = () => {
+		  	let show = document.getElementById("can_take_care").checked;
+		  	if (show) {
+		  		document.getElementById("experience-in-panel").style.display = "block";
+			} else {
+		  		document.getElementById("experience-in-panel").style.display = "none";
+		  		document.getElementById("pc_experience").checked = false;
+			}
+		  	toggleExperienceRate();
+		  }
+		  const toggleExperienceRate = () => {
+		  	let show = document.getElementById("pc_experience").checked;
+		  	if (show) {
+		  		document.getElementById("experience-rating-panel").style.display = "block";
+			} else {
+				document.getElementById("experience-rating-panel").style.display = "none";
+				document.getElementById("pc_avg_rate").value = 0;
+			}
+		  }
+		  const toggleUserColl = () => {
+		  	let show = document.getElementById("user_coll").value === 'confirmed';
+		  	if (show) {
+		  		document.getElementById("coll-panel").style.display = "block";
+			} else {
+		  		document.getElementById("coll-panel").style.display = "none";
+		  		document.getElementById("my_avg_rate").value = 0;
+		  		document.getElementById("pet_coll").value = "";
+			}
+		  }
+		  const initializeWindow = () => {
+			  toggleExperienceIn();
+			  toggleUserColl();
+		  }
+		  window.onload = initializeWindow;
 	  </script>
   </head>
   <body>
@@ -57,7 +93,7 @@
 					<td><%= existing_transactions[i].rating%></td>
 					<td><%= existing_transactions[i].cost%></td>
 					<td><%= existing_transactions[i].status%></td>
-					<td><button type="submit" class="btn btn-secondary" form="html_form" formaction="<%=s_date%>/<%=existing_transactions[i].ct_id%>/withdraw" <%= existing_transactions[i].status === 'Declined' ? 'disabled' : ''%>>Withdraw</button></td> <!-- TODO: Handle withdraw -->
+					<td><button type="submit" class="btn btn-secondary" form="html_form" formaction="<%=s_date%>/<%=existing_transactions[i].ct_id%>/withdraw" <%= existing_transactions[i].status === 'Declined' ? 'disabled' : ''%>>Withdraw</button></td>
 				</tr>
 			<% } %>
 			</tbody>
@@ -65,18 +101,68 @@
 	</div>
     <form id="html_form" role="form" method="post">
 		<button type="submit" class="btn btn-primary" formaction="<%=s_date%>/allocate">Allocate any care taker to me</button>
-		<button type="submit" class="btn btn-primary">Send request to all care takers in the filtered list</button> <!-- TODO: Should be handled with a form and post method -->
-		<button type="button" class="btn btn-primary" id="show-filter-btn" onclick="toggleFilter()">Show filter/sort panel</button>
+		<button type="submit" class="btn btn-primary" formaction="<%=s_date%>/request_all">Send request to all care takers in the filtered list</button> <!-- TODO: Should be handled with a form and post method -->
+		<button type="button" class="btn btn-primary" id="show-filter-btn" onclick="toggleFilter()"><%=toggle_filter==='none' ? 'Show' : 'Hide'%> filter/sort panel</button>
+		<input id="toggle_filter" name="toggle_filter" type="hidden" value="<%=toggle_filter%>">
 		<% if (allocate_unsuccessful_msg !== "") { %>
 			<br />
 			<small id="allocate_unsuccessful_msg" class="err"><%= allocate_unsuccessful_msg%></small>
 		<% } %>
-		<div id="filter-panel" style="display: none">
-			<div id="filter-sort-form" class="form-group">
-				<p>here</p>
-
+		<div id="filter-panel" style="display: <%=toggle_filter%>;>">
+			<br />
+			<div id="filter-form" class="form-group">
+				<div id="identity-filter-form" class="form-group">
+					<label for="ct_id_contains">Care Taker ID contains: </label>
+					<input type="text" class="form-control" id="ct_id_contains" name="ct_id_contains" style="width: 25%; display: inline-flex" value="<%=id_contains%>">
+					<label for="ct_name_contains" style="padding-left: 30px">Care Taker name contains: </label>
+					<input type="text" class="form-control" id="ct_name_contains" name="ct_name_contains" style="width: 25%; display: inline-flex" value="<%=name_contains%>">
+				</div>
+				<div id="performance-filter-form" class="form-group">
+					<label for="ft_pt">Care Taker Type: </label>
+					<select class="form-control" id="ft_pt" name="ft_pt" style="width: 150px; display: inline-flex">
+						<option value="" <%=ft_pt || ft_pt === '' ? 'selected' : ''%>></option>
+						<option value="full_time" <%=ft_pt && ft_pt === 'full_time' ? 'selected' : ''%>>full-time</option>
+						<option value="part_time" <%=ft_pt && ft_pt === 'part_time' ? 'selected' : ''%>>part-time</option>
+					</select>
+					<label for="avg_rate" style="padding-left: 30px">Average rating >= </label>
+					<input type="number" step=".1" class="form-control" id="avg_rate" name="avg_rate" style="width: 25%; display: inline-flex" value="<%=avg_rate%>">
+				</div>
+				<div id="experience-filter-form" class="form-group">
+					<input type="checkbox" name="can_take_care" id="can_take_care" value="true" <%=can_take_care ? 'checked' : ''%> onchange="toggleExperienceIn()">
+					<label for="can_take_care">Confirmed can take care of <%=category%>? </label>
+					<div id="experience-in-panel" class="form-group">
+						<label for="daily_price">Daily price <= </label>
+						<input type="number" step="10" class="form-control" id="daily_price" name="daily_price" style="width: 25%; display: inline-flex" value="<%=daily_price%>">
+						<br />
+						<input type="checkbox" name="pc_experience" id="pc_experience" value="true" <%=pc_experience ? 'checked' : ''%> onchange="toggleExperienceRate()">
+						<label for="pc_experience">Experience in taking care of <%=category%>? </label>
+						<div id="experience-rating-panel" class="form-group">
+							<label for="pc_avg_rate">Average rating of <%=category%> >= </label>
+							<input type="number" step=".1" class="form-control" id="pc_avg_rate" name="pc_avg_rate" style="width: 25%; display: inline-flex" value="<%=pc_avg_rate%>">
+						</div>
+					</div>
+				</div>
+				<div id="collaboration-filter-form" class="form-group">
+					<label for="user_coll">Collaboration history: </label>
+					<select class="form-control" id="user_coll" name="user_coll" style="width: 300px; display: inline-flex" onchange="toggleUserColl()">
+						<option value="" <%=user_coll || user_coll === '' ? 'selected' : ''%>></option>
+						<option value="requested" <%=user_coll && user_coll === 'requested' ? 'selected' : ''%>>Have requested transactions</option>
+						<option value="confirmed" <%=user_coll && user_coll === 'confirmed' ? 'selected' : ''%>>Have confirmed transactions</option>
+					</select>
+					<div id="coll-panel" class="form-group">
+						<label for="my_avg_rate">Average rating of by me >= </label>
+						<input type="number" step=".1" class="form-control" id="my_avg_rate" name="my_avg_rate" style="width: 25%; display: inline-flex" value="<%=my_avg_rate%>">
+						<label for="pet_coll">Collaboration history on the pet: </label>
+						<select class="form-control" id="pet_coll" name="pet_coll" style="width: 300px; display: inline-flex">
+							<option value="" <%=pet_coll || pet_coll === '' ? 'selected' : ''%>></option>
+							<option value="requested" <%=pet_coll && pet_coll === 'requested' ? 'selected' : ''%>>Have requested transactions</option>
+							<option value="confirmed" <%=pet_coll && pet_coll === 'confirmed' ? 'selected' : ''%>>Have confirmed transactions</option>
+						</select>
+					</div>
+				</div>
 			</div>
 		</div>
+		<div id="ct-list"></div>
 	</form>
   </body>
 </html>

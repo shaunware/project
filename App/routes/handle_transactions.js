@@ -45,25 +45,64 @@ var transfer_type;
 var payment_method;
 var existing_transactions;
 
+/* Filter/sort query */
+var toggle_filter = "none";
+var id_contains = "";
+var name_contains = "";
+var ft_pt = "";
+var avg_rate = 0;
+var can_take_care = false;
+var daily_price = 10000;
+var pc_experience = false;
+var pc_avg_rate = 0;
+var user_coll = "";
+var my_avg_rate = 0;
+var pet_coll = "";
+
 /* Util */
 var getString = (date) => date.getFullYear() + "-" + (date.getMonth() + 1) + "-" + date.getDate();
 var refreshPage = (res) => {
 	res.render('handle_transactions', {
 		title: 'Find Care Taker for your ' + category + ' ' + petName,
 		petid: petid,
+		category: category,
 		s_date: getString(s_date),
 		e_date: getString(e_date),
 		transfer_type: transfer_type,
 		payment_method: payment_method,
 		existing_transactions: existing_transactions,
-		allocate_unsuccessful_msg: allocate_unsuccessful_msg(category)
+		allocate_unsuccessful_msg: allocate_unsuccessful_msg(category),
+		toggle_filter: toggle_filter,
+		id_contains: id_contains,
+		name_contains: name_contains,
+		ft_pt: ft_pt,
+		avg_rate: avg_rate,
+		can_take_care: can_take_care,
+		daily_price: daily_price,
+		pc_experience: pc_experience,
+		pc_avg_rate: pc_avg_rate,
+		user_coll: user_coll,
+		my_avg_rate: my_avg_rate,
+		pet_coll: pet_coll
 	});
 }
 var redirectHere = (res) => {
 	res.redirect(url.format({
 		pathname:"/handle_transactions/" + userid + "/" + petid + "/" + getString(s_date),
 		query: {
-			"allocate_unsuccessful": allocate_unsuccessful
+			"allocate_unsuccessful": allocate_unsuccessful,
+			"toggle_filter": toggle_filter,
+			"id_contains": id_contains,
+			"name_contains": name_contains,
+			"ft_pt": ft_pt,
+			"avg_rate": avg_rate,
+			"can_take_care": can_take_care,
+			"daily_price": daily_price,
+			"pc_experience": pc_experience,
+			"pc_avg_rate": pc_avg_rate,
+			"user_coll": user_coll,
+			"my_avg_rate": my_avg_rate,
+			"pet_coll": pet_coll
 		}
 	}));
 }
@@ -78,6 +117,18 @@ router.get('/:userid/:petid/:s_date', function(req, res, next) {
 	petid = req.params.petid;
 	s_date = new Date(req.params.s_date);
 	allocate_unsuccessful = req.query.allocate_unsuccessful;
+	toggle_filter = req.query.toggle_filter ? req.query.toggle_filter : "none";
+	id_contains = req.query.id_contains;
+	name_contains = req.query.name_contains;
+	ft_pt = req.query.ft_pt;
+	avg_rate = req.query.avg_rate ? req.query.avg_rate : 0;
+	can_take_care = req.query.can_take_care ? req.query.can_take_care : false;
+	daily_price = req.query.daily_price ? req.query.daily_price : 10000;
+	pc_experience = req.query.pc_experience ? req.query.pc_experience : false;
+	pc_avg_rate = req.query.pc_avg_rate ? req.query.pc_avg_rate : 0;
+	user_coll = req.query.user_coll ? req.query.user_coll : "";
+	my_avg_rate = req.query.my_avg_rate ? req.query.my_avg_rate : 0;
+	pet_coll = req.query.pet_coll ? req.query.pet_coll : "";
 	pool.query(all_petowner_query, (err, data) => {
 		if (err !== undefined) {
 			res.render('connection_error');
@@ -165,6 +216,25 @@ router.post('/:userid/:petid/:s_date/:ct_id/withdraw', function(req, res, next) 
 		redirectHere(res);
 	})
 })
+
+router.post('/:userid/:petid/:s_date/request_all', function(req, res, next) {
+	userid = req.params.userid;
+	petid = req.params.petid;
+	s_date = new Date(req.params.s_date);
+	toggle_filter = req.body.toggle_filter;
+	id_contains = req.body.ct_id_contains;
+	name_contains = req.body.ct_name_contains;
+	ft_pt = req.body.ft_pt;
+	avg_rate = req.body.avg_rate;
+	can_take_care = req.body.can_take_care;
+	daily_price = req.body.daily_price;
+	pc_experience = req.body.pc_experience;
+	pc_avg_rate = req.body.pc_avg_rate;
+	user_coll = req.body.user_coll;
+	my_avg_rate = req.body.my_avg_rate;
+	pet_coll = req.body.pet_coll;
+	redirectHere(res);
+});
 
 module.exports = router;
 
