@@ -30,7 +30,7 @@
     <h1><%= title%></h1>
 	<a href="../../../test"><button class="btn btn-secondary">Edit request</button></a> <!-- TODO: Change to actual edit path -->
 	<button class="btn btn-secondary" form="html_form" formaction="<%=s_date%>/delete">Delete request</button>
-	<button class="btn btn-secondary" form="html_form" formaction="<%=s_date%>/back">Back</button> <!-- TODO: Handle with form submit to check if empty -->
+	<button class="btn btn-secondary" form="html_form" formaction="<%=s_date%>/back">Back</button>
 	<br /><br />
 	<div id="request-info">
 		<p><b>Start date: </b><%= s_date%><span style="padding-left: 30px"></span><b>End date: </b><%= e_date%></p>
@@ -57,7 +57,7 @@
 					<td><%= existing_transactions[i].rating%></td>
 					<td><%= existing_transactions[i].cost%></td>
 					<td><%= existing_transactions[i].status%></td>
-					<td><button type="button" class="btn btn-secondary" <%= existing_transactions[i].status === 'Declined' ? 'disabled' : ''%>>Withdraw</button></td> <!-- TODO: Handle withdraw -->
+					<td><button type="submit" class="btn btn-secondary" form="html_form" formaction="<%=s_date%>/<%=existing_transactions[i].ct_id%>/withdraw" <%= existing_transactions[i].status === 'Declined' ? 'disabled' : ''%>>Withdraw</button></td> <!-- TODO: Handle withdraw -->
 				</tr>
 			<% } %>
 			</tbody>

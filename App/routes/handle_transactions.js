@@ -31,6 +31,7 @@ SELECT CTC.ct_id
  */
 var delete_request_query = 'DELETE FROM Requests WHERE pet_id=$1 AND s_date=$2';
 var delete_empty_request_qeury = 'CALL delete_empty_request($1, $2)';
+var withdraw_query = 'UPDATE Transactions SET status=\'Withdrawn\' WHERE pet_id=$1 AND s_date=$2 AND ct_id=$3';
 
 /* Data */
 var userid;
@@ -150,8 +151,18 @@ router.post('/:userid/:petid/:s_date/back', function (req, res, next) {
 	petid = req.params.petid;
 	s_date = new Date(req.params.s_date);
 	pool.query(delete_empty_request_qeury, [petid, s_date], (err, data) => {
-		console.log(err);
 		res.redirect('/test'); //TODO: Redirect to the view request page
+	})
+})
+
+// WITHDRAW
+router.post('/:userid/:petid/:s_date/:ct_id/withdraw', function(req, res, next) {
+	userid = req.params.userid;
+	petid = req.params.petid;
+	s_date = new Date(req.params.s_date);
+	var ct_id = req.params.ct_id;
+	pool.query(withdraw_query, [petid, getString(s_date), ct_id], (err, data) => {
+		redirectHere(res);
 	})
 })
 
