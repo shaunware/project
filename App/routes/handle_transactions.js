@@ -21,6 +21,18 @@ SELECT T.ct_id AS ct_id, T.cost AS cost, C.rating AS rating, T.status AS status,
   FROM Transactions T INNER JOIN CareTakers C ON T.ct_id=C.userid
   WHERE T.pet_id={$1=this petid} AND T.s_date={$2=this s_date} AND T.status<>'Withdrawn'
  */
+var all_ct_query = 'SELECT CT.userid AS userid, U.name AS name, CT.rating AS rating, CTC.daily_price AS daily_price,\n' +
+	'  CASE WHEN EXISTS(SELECT 1 FROM FullTimeCareTakers F WHERE F.userid=CT.userid) THEN \'Full time\' ELSE \'Part time\' END AS category\n' +
+	'FROM (Users U INNER JOIN CareTakers CT on U.userid = CT.userid) LEFT JOIN CanTakeCare CTC ON CT.userid=CTC.ct_id\n' +
+	'WHERE $1 NOT IN (SELECT category FROM CannotTakeCare CN WHERE CN.ct_id=CT.userid)\n' +
+	'AND is_available(CT.userid, $2, $3)';
+/*
+SELECT CT.userid AS userid, U.name AS name, CT.rating AS rating, CTC.daily_price AS daily_price,
+  CASE WHEN EXISTS(SELECT 1 FROM FullTimeCareTakers F WHERE F.userid=CT.userid) THEN 'Full time' ELSE 'Part time' END AS category
+FROM (Users U INNER JOIN CareTakers CT on U.userid = CT.userid) LEFT JOIN CanTakeCare CTC ON CT.userid=CTC.ct_id
+WHERE {$1=this category} NOT IN (SELECT category FROM CannotTakeCare CN WHERE CN.ct_id=CT.userid)
+AND is_available(CT.userid, {$2=this s_date}, {$3=this e_date})
+ */
 var allocate_query = 'SELECT allocate_success($1, $2, $3)';
 /*
 SELECT CTC.ct_id
@@ -44,6 +56,7 @@ var e_date;
 var transfer_type;
 var payment_method;
 var existing_transactions;
+var care_takers;
 
 /* Filter/sort query */
 var toggle_filter = "none";
@@ -72,6 +85,7 @@ var refreshPage = (res) => {
 		payment_method: payment_method,
 		existing_transactions: existing_transactions,
 		allocate_unsuccessful_msg: allocate_unsuccessful_msg(category),
+		care_takers: care_takers,
 		toggle_filter: toggle_filter,
 		id_contains: id_contains,
 		name_contains: name_contains,
@@ -148,7 +162,12 @@ router.get('/:userid/:petid/:s_date', function(req, res, next) {
 									payment_method = request.payment_type;
 									pool.query(existing_transaction_query, [petid, getString(s_date)], (err, data) => {
 										existing_transactions = data.rows;
-										refreshPage(res);
+										pool.query(all_ct_query, [category, getString(s_date), getString(e_date)], (err, data) => {
+											console.log("data:");
+											console.log(data.rows);
+											care_takers = data.rows;
+											refreshPage(res);
+										})
 									})
 								} else {
 									res.render('not_found_error', {component: 'request'});

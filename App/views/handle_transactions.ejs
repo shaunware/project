@@ -18,11 +18,11 @@
 		  	let b = document.getElementById("show-filter-btn");
 		  	if (f.style.display === "none") {
 		  		f.style.display = "block";
-		  		b.innerText = "Hide filter/sort panel";
+		  		b.innerText = "Hide filter panel";
 				document.getElementById("toggle_filter").value = "block";
 			} else {
 		  		f.style.display = "none";
-		  		b.innerText = "Show filter/sort panel";
+		  		b.innerText = "Show filter panel";
 				document.getElementById("toggle_filter").value = "none";
 			}
 		  }
@@ -102,7 +102,7 @@
     <form id="html_form" role="form" method="post">
 		<button type="submit" class="btn btn-primary" formaction="<%=s_date%>/allocate">Allocate any care taker to me</button>
 		<button type="submit" class="btn btn-primary" formaction="<%=s_date%>/request_all">Send request to all care takers in the filtered list</button> <!-- TODO: Should be handled with a form and post method -->
-		<button type="button" class="btn btn-primary" id="show-filter-btn" onclick="toggleFilter()"><%=toggle_filter==='none' ? 'Show' : 'Hide'%> filter/sort panel</button>
+		<button type="button" class="btn btn-primary" id="show-filter-btn" onclick="toggleFilter()"><%=toggle_filter==='none' ? 'Show' : 'Hide'%> filter panel</button>
 		<input id="toggle_filter" name="toggle_filter" type="hidden" value="<%=toggle_filter%>">
 		<% if (allocate_unsuccessful_msg !== "") { %>
 			<br />
@@ -162,7 +162,34 @@
 				</div>
 			</div>
 		</div>
-		<div id="ct-list"></div>
+		<br />
+		<div id="ct-list">
+			<table class="table">
+				<thead>
+					<tr><th scope="colgroup" colspan="6">All care takers with filtered conditions</th></tr>
+					<tr>
+						<th scope="col">Care Taker ID</th>
+						<th scope="col">Name</th>
+						<th scope="col">Category</th>
+						<th scope="col">Average Rating</th>
+						<th scope="col">Daily price</th>
+						<th scope="col"><!-- Request --></th>
+					</tr>
+				</thead>
+				<tbody>
+				<% for (var i=0; i<care_takers.length; i++) { %>
+					<tr>
+						<td><%=care_takers[i].userid%></td>
+						<td><%=care_takers[i].name%></td>
+						<td><%=care_takers[i].category%></td>
+						<td><%=care_takers[i].rating%></td>
+						<td><%=care_takers[i].daily_price%></td>
+						<td>Request</td> <!-- TODO: Handle form submit request -->
+					</tr>
+				<% } %>
+				</tbody>
+			</table>
+		</div>
 	</form>
   </body>
 </html>
