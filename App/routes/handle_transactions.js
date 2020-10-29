@@ -36,14 +36,18 @@ var retrieve_ct_query = () => {
 		res = res + daily_price_filter;
 		if (pc_experience) {
 			res = res + experience_pc_filter;
-			res = res + pc_avg_rate_filter;
+			if (pc_avg_rate > 0) {
+				res = res + pc_avg_rate_filter;
+			}
 		}
 	}
 	if (user_coll === 'requested') {
 		res = res + history_requested_filter;
 	} else if (user_coll === 'confirmed') {
 		res = res + history_confirmed_filter;
-		res = res + my_avg_rate_filter;
+		if (my_avg_rate > 0) {
+			res = res + my_avg_rate_filter;
+		}
 		if (pet_coll === 'requested') {
 			res = res + history_pet_requested_filter;
 		} else if (pet_coll === 'confirmed') {
@@ -64,18 +68,18 @@ FROM (Users U INNER JOIN CareTakers CT on U.userid = CT.userid) LEFT JOIN CanTak
 WHERE {$1=this category} NOT IN (SELECT category FROM CannotTakeCare CN WHERE CN.ct_id=CT.userid)
 AND is_available(CT.userid, {$2=this s_date}, {$3=this e_date})
  */
-var ct_id_filter = 'AND CT.userid LIKE \'%$4%\''; // $4 = userid contains
-var ct_name_filter = 'AND U.name LIKE \'%$5%\''; // $5 = user name contains
+var ct_id_filter = 'AND CT.userid LIKE \'%\'||$4||\'%\''; // $4 = userid contains
+var ct_name_filter = 'AND U.name LIKE \'%\'||$5||\'%\''; // $5 = user name contains
 var full_time_filter = 'AND CT.userid IN (SELECT F.userid FROM FullTimeCareTakers F)';
 var part_time_filter = 'AND CT.userid IN (SELECT P.userid FROM PartTimeCareTakers P)';
 var avg_rating_filter = 'AND CT.rating >= $6'; // $6 = average rating should be >= this
-var can_take_care_filter = 'AND $1 IN (SELECT category FROM CanTakeCare C WHERE C.ct_id=CT.userid';
+var can_take_care_filter = 'AND $1 IN (SELECT category FROM CanTakeCare C WHERE C.ct_id=CT.userid)';
 var daily_price_filter = 'AND CTC.daily_price <= $7'; // $7 = daily price no larger than this
-var experience_pc_filter = 'AND EXISTS(SELECT 1 FROM Transactions T INNER JOIN Pets P WHERE T.ct_id=CT.userid AND P.category=$1 AND T.status=\'Confirmed\')';
-var pc_avg_rate_filter = 'AND (SELECT AVG(rate) FROM Transactions T INNER JOIN Pets P WHERE T.ct_id=CT.userid AND P.category=$1) >= $8'; // $8 = avg rating of the pet category;
-var history_requested_filter = 'AND EXISTS(SELECT 1 FROM Transactions T INNER JOIN Pets P WHERE T.ct_id=CT.userid AND P.owner=$9)'; // $9 = this userid
-var history_confirmed_filter = 'AND EXISTS(SELECT 1 FROM Transactions T INNER JOIN Pets P WHERE T.ct_id=CT.userid AND P.owner=$9 AND T.status=\'Confirmed\')';
-var my_avg_rate_filter = 'AND (SELECT AVG(rate) FROM Transactions T INNER JOIN Pets P where T.ct_id=CT.userid AND P.owner=$9) >= $10'; // $10 = avg rating by me;
+var experience_pc_filter = 'AND EXISTS(SELECT 1 FROM Transactions T INNER JOIN Pets P ON T.pet_id=P.petid WHERE T.ct_id=CT.userid AND P.category=$1 AND T.status=\'Confirmed\')';
+var pc_avg_rate_filter = 'AND (SELECT AVG(rate) FROM Transactions T INNER JOIN Pets P ON T.pet_id=P.petid WHERE T.ct_id=CT.userid AND P.category=$1) >= $8'; // $8 = avg rating of the pet category;
+var history_requested_filter = 'AND EXISTS(SELECT 1 FROM Transactions T INNER JOIN Pets P ON T.pet_id=P.petid WHERE T.ct_id=CT.userid AND P.owner=$9)'; // $9 = this userid
+var history_confirmed_filter = 'AND EXISTS(SELECT 1 FROM Transactions T INNER JOIN Pets P ON T.pet_id=P.petid WHERE T.ct_id=CT.userid AND P.owner=$9 AND T.status=\'Confirmed\')';
+var my_avg_rate_filter = 'AND (SELECT AVG(rate) FROM Transactions T INNER JOIN Pets P ON T.pet_id=P.petid where T.ct_id=CT.userid AND P.owner=$9) >= $10'; // $10 = avg rating by me;
 var history_pet_requested_filter = 'AND EXISTS(SELECT 1 FROM Transactions T WHERE T.ct_id=CT.userid AND T.pet_id=$11)'; // $11 = this pet id
 var history_pet_confirmed_filter = 'AND EXISTS(SELECT 1 FROM Transactions T WHERE T.ct_id=CT.userid AND T.pet_id=$11 AND T.status=\'Confirmed\')';
 var safe_guard = 'AND $4 <> \'!\' AND $5 <> \'!\' AND $6 >= 0 AND $7 >= 0 AND $8 >= 0 AND $9 <> \'!\' AND $10 >= 0 AND $11 <> \'!\'';
@@ -210,6 +214,7 @@ router.get('/:userid/:petid/:s_date', function(req, res, next) {
 									pool.query(existing_transaction_query, [petid, getString(s_date)], (err, data) => {
 										existing_transactions = data.rows;
 										pool.query(retrieve_ct_query() + safe_guard, [category, getString(s_date), getString(e_date), id_contains, name_contains, avg_rate, daily_price, pc_avg_rate, userid, my_avg_rate, petid], (err, data) => {
+											console.log(err);
 											care_takers = data.rows;
 											console.log(care_takers);
 											refreshPage(res);
