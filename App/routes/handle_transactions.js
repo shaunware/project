@@ -21,6 +21,37 @@ SELECT T.ct_id AS ct_id, T.cost AS cost, C.rating AS rating, T.status AS status,
   FROM Transactions T INNER JOIN CareTakers C ON T.ct_id=C.userid
   WHERE T.pet_id={$1=this petid} AND T.s_date={$2=this s_date} AND T.status<>'Withdrawn'
  */
+var retrieve_ct_query = () => {
+	var res = all_ct_query;
+	if (id_contains !== "") { res = res + ct_id_filter; }
+	if (name_contains !== "") { res = res + ct_name_filter; }
+	if (ft_pt === 'full_time') {
+		res = res + full_time_filter;
+	} else if (ft_pt === 'part_time') {
+		res = res + part_time_filter;
+	}
+	if (avg_rate > 0) { res = res + avg_rating_filter; }
+	if (can_take_care) {
+		res = res + can_take_care_filter;
+		res = res + daily_price_filter;
+		if (pc_experience) {
+			res = res + experience_pc_filter;
+			res = res + pc_avg_rate_filter;
+		}
+	}
+	if (user_coll === 'requested') {
+		res = res + history_requested_filter;
+	} else if (user_coll === 'confirmed') {
+		res = res + history_confirmed_filter;
+		res = res + my_avg_rate_filter;
+		if (pet_coll === 'requested') {
+			res = res + history_pet_requested_filter;
+		} else if (pet_coll === 'confirmed') {
+			res = res + history_pet_confirmed_filter;
+		}
+	}
+	return res;
+}
 var all_ct_query = 'SELECT CT.userid AS userid, U.name AS name, CT.rating AS rating, CTC.daily_price AS daily_price,\n' +
 	'  CASE WHEN EXISTS(SELECT 1 FROM FullTimeCareTakers F WHERE F.userid=CT.userid) THEN \'Full time\' ELSE \'Part time\' END AS category\n' +
 	'FROM (Users U INNER JOIN CareTakers CT on U.userid = CT.userid) LEFT JOIN CanTakeCare CTC ON CT.userid=CTC.ct_id\n' +
@@ -33,6 +64,22 @@ FROM (Users U INNER JOIN CareTakers CT on U.userid = CT.userid) LEFT JOIN CanTak
 WHERE {$1=this category} NOT IN (SELECT category FROM CannotTakeCare CN WHERE CN.ct_id=CT.userid)
 AND is_available(CT.userid, {$2=this s_date}, {$3=this e_date})
  */
+var ct_id_filter = 'AND CT.userid LIKE \'%$4%\''; // $4 = userid contains
+var ct_name_filter = 'AND U.name LIKE \'%$5%\''; // $5 = user name contains
+var full_time_filter = 'AND CT.userid IN (SELECT F.userid FROM FullTimeCareTakers F)';
+var part_time_filter = 'AND CT.userid IN (SELECT P.userid FROM PartTimeCareTakers P)';
+var avg_rating_filter = 'AND CT.rating >= $6'; // $6 = average rating should be >= this
+var can_take_care_filter = 'AND $1 IN (SELECT category FROM CanTakeCare C WHERE C.ct_id=CT.userid';
+var daily_price_filter = 'AND CTC.daily_price <= $7'; // $7 = daily price no larger than this
+var experience_pc_filter = 'AND EXISTS(SELECT 1 FROM Transactions T INNER JOIN Pets P WHERE T.ct_id=CT.userid AND P.category=$1 AND T.status=\'Confirmed\')';
+var pc_avg_rate_filter = 'AND (SELECT AVG(rate) FROM Transactions T INNER JOIN Pets P WHERE T.ct_id=CT.userid AND P.category=$1) >= $8'; // $8 = avg rating of the pet category;
+var history_requested_filter = 'AND EXISTS(SELECT 1 FROM Transactions T INNER JOIN Pets P WHERE T.ct_id=CT.userid AND P.owner=$9)'; // $9 = this userid
+var history_confirmed_filter = 'AND EXISTS(SELECT 1 FROM Transactions T INNER JOIN Pets P WHERE T.ct_id=CT.userid AND P.owner=$9 AND T.status=\'Confirmed\')';
+var my_avg_rate_filter = 'AND (SELECT AVG(rate) FROM Transactions T INNER JOIN Pets P where T.ct_id=CT.userid AND P.owner=$9) >= $10'; // $10 = avg rating by me;
+var history_pet_requested_filter = 'AND EXISTS(SELECT 1 FROM Transactions T WHERE T.ct_id=CT.userid AND T.pet_id=$11)'; // $11 = this pet id
+var history_pet_confirmed_filter = 'AND EXISTS(SELECT 1 FROM Transactions T WHERE T.ct_id=CT.userid AND T.pet_id=$11 AND T.status=\'Confirmed\')';
+var safe_guard = 'AND $4 <> \'!\' AND $5 <> \'!\' AND $6 >= 0 AND $7 >= 0 AND $8 >= 0 AND $9 <> \'!\' AND $10 >= 0 AND $11 <> \'!\'';
+
 var allocate_query = 'SELECT allocate_success($1, $2, $3)';
 /*
 SELECT CTC.ct_id
@@ -123,18 +170,18 @@ var redirectHere = (res) => {
 
 /* Err msg */
 var allocate_unsuccessful = false;
-var allocate_unsuccessful_msg = (category) => allocate_unsuccessful ? "* Sorry we cannot find any full-time care taker available declared " + category + " as a pet category that he or she can take care of." : "";
+var allocate_unsuccessful_msg = (category) => allocate_unsuccessful && allocate_unsuccessful === true ? "* Sorry we cannot find any full-time care taker available declared " + category + " as a pet category that he or she can take care of." : "";
 
 // GET
 router.get('/:userid/:petid/:s_date', function(req, res, next) {
 	userid = req.params.userid; //TODO: May need to update with session user id
 	petid = req.params.petid;
 	s_date = new Date(req.params.s_date);
-	allocate_unsuccessful = req.query.allocate_unsuccessful;
+	allocate_unsuccessful = req.query.allocate_unsuccessful ? req.query.allocate_unsuccessful : false;
 	toggle_filter = req.query.toggle_filter ? req.query.toggle_filter : "none";
-	id_contains = req.query.id_contains;
-	name_contains = req.query.name_contains;
-	ft_pt = req.query.ft_pt;
+	id_contains = req.query.id_contains ? req.query.id_contains : "";
+	name_contains = req.query.name_contains ? req.query.name_contains : "";
+	ft_pt = req.query.ft_pt ? req.query.ft_pt : "";
 	avg_rate = req.query.avg_rate ? req.query.avg_rate : 0;
 	can_take_care = req.query.can_take_care ? req.query.can_take_care : false;
 	daily_price = req.query.daily_price ? req.query.daily_price : 10000;
@@ -162,10 +209,9 @@ router.get('/:userid/:petid/:s_date', function(req, res, next) {
 									payment_method = request.payment_type;
 									pool.query(existing_transaction_query, [petid, getString(s_date)], (err, data) => {
 										existing_transactions = data.rows;
-										pool.query(all_ct_query, [category, getString(s_date), getString(e_date)], (err, data) => {
-											console.log("data:");
-											console.log(data.rows);
+										pool.query(retrieve_ct_query() + safe_guard, [category, getString(s_date), getString(e_date), id_contains, name_contains, avg_rate, daily_price, pc_avg_rate, userid, my_avg_rate, petid], (err, data) => {
 											care_takers = data.rows;
+											console.log(care_takers);
 											refreshPage(res);
 										})
 									})
@@ -209,6 +255,7 @@ router.post('/:userid/:petid/:s_date/delete', function (req, res, next) {
 	userid = req.params.userid;
 	petid = req.params.petid;
 	s_date = new Date(req.params.s_date);
+	allocate_unsuccessful = false;
 	pool.query(delete_request_query, [petid, s_date], (err, data) => {
 		console.log("Deleted the query and all transactions of " + petid + " on " + getString(s_date));
 		res.redirect('/test'); //TODO: Redirect to the view pet page
@@ -220,6 +267,7 @@ router.post('/:userid/:petid/:s_date/back', function (req, res, next) {
 	userid = req.params.userid;
 	petid = req.params.petid;
 	s_date = new Date(req.params.s_date);
+	allocate_unsuccessful = false;
 	pool.query(delete_empty_request_qeury, [petid, s_date], (err, data) => {
 		res.redirect('/test'); //TODO: Redirect to the view request page
 	})
@@ -241,8 +289,8 @@ router.post('/:userid/:petid/:s_date/request_all', function(req, res, next) {
 	petid = req.params.petid;
 	s_date = new Date(req.params.s_date);
 	toggle_filter = req.body.toggle_filter;
-	id_contains = req.body.ct_id_contains;
-	name_contains = req.body.ct_name_contains;
+	id_contains = req.body.ct_id_contains.trim();
+	name_contains = req.body.ct_name_contains.trim();
 	ft_pt = req.body.ft_pt;
 	avg_rate = req.body.avg_rate;
 	can_take_care = req.body.can_take_care;
@@ -252,6 +300,7 @@ router.post('/:userid/:petid/:s_date/request_all', function(req, res, next) {
 	user_coll = req.body.user_coll;
 	my_avg_rate = req.body.my_avg_rate;
 	pet_coll = req.body.pet_coll;
+	allocate_unsuccessful = false;
 	redirectHere(res);
 });
 
