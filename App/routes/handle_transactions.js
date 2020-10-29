@@ -60,13 +60,15 @@ var all_ct_query = 'SELECT CT.userid AS userid, U.name AS name, CT.rating AS rat
 	'  CASE WHEN EXISTS(SELECT 1 FROM FullTimeCareTakers F WHERE F.userid=CT.userid) THEN \'Full time\' ELSE \'Part time\' END AS category\n' +
 	'FROM (Users U INNER JOIN CareTakers CT on U.userid = CT.userid) LEFT JOIN CanTakeCare CTC ON CT.userid=CTC.ct_id\n' +
 	'WHERE $1 NOT IN (SELECT category FROM CannotTakeCare CN WHERE CN.ct_id=CT.userid)\n' +
-	'AND is_available(CT.userid, $2, $3)';
+	'AND is_available(CT.userid, $2, $3)\n' +
+	'AND NOT EXISTS(SELECT 1 FROM Transactions T WHERE T.ct_id=CT.userid AND T.pet_id=$11 AND T.s_date=$2 AND (T.status=\'Pending\' OR T.status=\'Confirmed\' OR T.status=\'Declined\'))';
 /*
 SELECT CT.userid AS userid, U.name AS name, CT.rating AS rating, CTC.daily_price AS daily_price,
   CASE WHEN EXISTS(SELECT 1 FROM FullTimeCareTakers F WHERE F.userid=CT.userid) THEN 'Full time' ELSE 'Part time' END AS category
 FROM (Users U INNER JOIN CareTakers CT on U.userid = CT.userid) LEFT JOIN CanTakeCare CTC ON CT.userid=CTC.ct_id
 WHERE {$1=this category} NOT IN (SELECT category FROM CannotTakeCare CN WHERE CN.ct_id=CT.userid)
 AND is_available(CT.userid, {$2=this s_date}, {$3=this e_date})
+AND NOT EXISTS(SELECT 1 FROM Transactions T WHERE T.ct_id=CT.userid AND T.pet_id=$11 AND T.s_date=$2 AND (T.status='Pending' OR T.status='Confirmed' OR T.status='Declined'))
  */
 var ct_id_filter = 'AND CT.userid LIKE \'%\'||$4||\'%\''; // $4 = userid contains
 var ct_name_filter = 'AND U.name LIKE \'%\'||$5||\'%\''; // $5 = user name contains
