@@ -97,6 +97,7 @@ SELECT CTC.ct_id
 var delete_request_query = 'DELETE FROM Requests WHERE pet_id=$1 AND s_date=$2';
 var delete_empty_request_qeury = 'CALL delete_empty_request($1, $2)';
 var withdraw_query = 'UPDATE Transactions SET status=\'Withdrawn\' WHERE pet_id=$1 AND s_date=$2 AND ct_id=$3';
+var individual_request_query = 'CALL send_request($1, $2, $3)'; // $1=petid, $2=s_date, $3=ct_id
 
 /* Data */
 var userid;
@@ -216,9 +217,7 @@ router.get('/:userid/:petid/:s_date', function(req, res, next) {
 									pool.query(existing_transaction_query, [petid, getString(s_date)], (err, data) => {
 										existing_transactions = data.rows;
 										pool.query(retrieve_ct_query() + safe_guard, [category, getString(s_date), getString(e_date), id_contains, name_contains, avg_rate, daily_price, pc_avg_rate, userid, my_avg_rate, petid], (err, data) => {
-											console.log(err);
 											care_takers = data.rows;
-											console.log(care_takers);
 											refreshPage(res);
 										})
 									})
@@ -245,7 +244,6 @@ router.post('/:userid/:petid/:s_date/allocate', function(req, res, next) {
 	petid = req.params.petid;
 	s_date = new Date(req.params.s_date);
 	pool.query(allocate_query, [petid, getString(s_date), getString(e_date)], (err, data) => {
-		console.log(data.rows[0].allocate_success);
 		if (data.rows[0].allocate_success) {
 			console.log("Allocated the a full-time care taker for request of petid from " + getString(s_date) + " to " + getString(e_date));
 			allocate_unsuccessful = false;
@@ -310,6 +308,30 @@ router.post('/:userid/:petid/:s_date/request_all', function(req, res, next) {
 	allocate_unsuccessful = false;
 	redirectHere(res);
 });
+
+router.post('/:userid/:petid/:s_date/:ct_id/request', function(req, res, next) {
+	userid = req.params.userid;
+	petid = req.params.petid;
+	s_date = new Date(req.params.s_date);
+	var ct_id = req.params.ct_id;
+	toggle_filter = req.body.toggle_filter;
+	id_contains = req.body.ct_id_contains.trim();
+	name_contains = req.body.ct_name_contains.trim();
+	ft_pt = req.body.ft_pt;
+	avg_rate = req.body.avg_rate;
+	can_take_care = req.body.can_take_care;
+	daily_price = req.body.daily_price;
+	pc_experience = req.body.pc_experience;
+	pc_avg_rate = req.body.pc_avg_rate;
+	user_coll = req.body.user_coll;
+	my_avg_rate = req.body.my_avg_rate;
+	pet_coll = req.body.pet_coll;
+	allocate_unsuccessful = false;
+	pool.query(individual_request_query, [petid, getString(s_date), ct_id], (err, data) => {
+		console.log(err);
+		redirectHere(res);
+	});
+})
 
 module.exports = router;
 
