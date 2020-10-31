@@ -1,10 +1,14 @@
 var express = require('express');
 var router = express.Router();
-require('dotenv').config({path: __dirname + '/../.env'});
 
 const { Pool } = require('pg')
-
-const pool = new Pool({connectionString:process.env.DATABASE_URL})
+const pool = new Pool({
+  user: 'postgres',
+  host: 'localhost',
+  database: 'postgres',
+  password: '********',
+  port: 5432,
+})
 
 /* SQL Query */
 var sql_query = 'SELECT * FROM student_info';

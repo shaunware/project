@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="./register.css">
+    <title>Register</title>
+</head>
+
+
+<body>
+    <div class="topnav">
+        <div class="title">Team 66 Pet Care</div>
+    </div>
+
+    <div class="register">
+ 
+        <form method="post" action="register.js">
+    
+            <p><label class="label_input">username</label><input type="text" id="username" class="text_field" name="1" /></p>
+            <p><label class="label_input">password</label><input type="password" id="password" class="text_field" name="2" /></p>
+            <p><label class="label_input">profile</label><input type="text" id="username" class="text_field" name="3" /></p>
+            <div class="options">
+                <p>identity</p>
+                <select id="select">
+                    <option value="">care taker</option>
+                    <option value="">pet owner</option>
+                    <option value="">administrator</option>
+                </select>
+            </div>           
+            
+            <div id="login_control">
+                <input type="submit" id="btn_register" value="register" οnclick="return checkuser()"/>
+            </div>
+        </form>
+    </div>
+</body>
+</html>

@@ -1,0 +1,91 @@
+* {
+    margin: 0;
+    padding: 0;
+    font-family: Arial, Helvetica, sans-serif;
+    list-style: none;
+}
+
+a {
+    text-decoration: none;
+}
+
+body {
+    margin: 0;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 1em;
+}
+
+.topnav {
+    overflow: hidden;
+    background-color: #008c8c;
+    height: 80px;
+    width: 100%;
+}
+
+.topnav .title {
+    color: seashell;
+    font-size: 1.8em;
+    font-family: 'Segoe Print', Tahoma, Geneva, Verdana, sans-serif;
+    font-weight: bold;
+    width: 100%;
+    line-height: 80px;
+    float: none;
+    text-align: center;
+}
+
+.welcome {
+    width: 100%;
+    height: 120px;
+    text-align: center;
+    margin-top: 30px;
+}
+
+.welcome h1 {
+    font-size: 1.5em;
+    padding-bottom: 0.8em;
+}
+
+.middlenav {
+    height: 450px;
+    width: 100%;
+    background-image: url(../../images/indexbg.jpg);
+    background-size: initial;
+    background-repeat: no-repeat;
+    background-position: center;
+    position: absolute;
+}
+
+.panels {
+    background:#008c8c;
+    width: 200px;
+    height: 240px;
+    align-content: center;
+    margin-left: 33em;
+    margin-top: 2em;
+    position: absolute;
+    border-radius: 4px;
+}
+
+.middlenav .login{
+    height: 20px;
+    margin: 3em 2.5em;
+    text-align: center;
+    line-height: 20px;
+    font-size: 1.2em;
+}
+
+.middlenav .register {
+    height: 20px;
+    margin: 3em 2.5em;
+    text-align: center;
+    line-height: 20px;
+    font-size: 1.2em;
+}
+
+.middlenav a {
+    color: seashell;
+}
+
+.middlenav a:hover {
+    color: wheat;
+}
