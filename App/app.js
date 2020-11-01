@@ -35,6 +35,10 @@ var insertRouter = require('./routes/insert');
 /* --- Pet Owner -------------- */
 var newPetRouter = require('./routes/new_pet');
 
+/* --- Pet  -------------- */
+var petRouter = require('./routes/pet');
+var petsRouter = require('./routes/pets');
+
 var app = express();
 
 // view engine setup
@@ -77,6 +81,10 @@ app.use('/insert', insertRouter);
 
 /* --- Pet Owner -------------- */
 app.use('/new_pet', newPetRouter);
+
+/* --- Pet  -------------- */
+app.use('/pet', petRouter);
+app.use('/pets', petsRouter);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
