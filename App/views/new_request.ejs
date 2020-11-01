@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+  <head>
+		<!-- Page Title -->
+    <title><%= title%></title>
+    <link rel='stylesheet' href='/stylesheets/style.css' />
+		
+		<!-- CSS for Styling -->
+		<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css" integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS" crossorigin="anonymous">
+		
+		<!-- JavaScript for Interactivity -->
+		<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.6/umd/popper.min.js" integrity="sha384-wHAiFfRlMFy6i5SRaxvfOCifBUQy1xHdJ/yoi7FRNXMRBu5WHdZYu1hA6ZOblgut" crossorigin="anonymous"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/js/bootstrap.min.js" integrity="sha384-B0UglyR+jN6CkvvICOB2joaf5I4l3gm9GU6Hc1og6Ls7i6U/mkkaduKaBhlAXv9k" crossorigin="anonymous"></script>
+	  <script>
+	  </script>
+  </head>
+  <body>
+    <h1><%= title%></h1>
+	<a href="../../../test"><button class="btn btn-secondary">Edit pet profile</button></a> <!-- TODO: Change to actual edit path -->
+	<a href="../../../test"><button class="btn btn-secondary">Back</button></a> <!-- TODO: Change to actual pets path -->
+	<br /><br />
+	<form id="html_form" role="form" method="post">
+		<div id="pet-info">
+			<p><b>Category: </b><%= category%></p>
+			<p><b>Special requirements: </b><%= requirements%></p>
+		</div>
+		<div class="form-group" id="date-specification">
+			<label for="s_date">Start Date</label>
+			<input type="text" class="form-control" id="s_date" name="s_date" value=<%= s_date%> >
+			<label for="e_date" style="padding-left: 20px">End Date</label>
+			<input type="text" class="form-control" id="e_date" name="e_date" value=<%= e_date%> >
+			<% if (sDateErr !== "") { %>
+				<br />
+				<small id="sDateErr" class="err"><%= sDateErr%></small>
+			<% } %>
+			<% if (eDateErr !== "") { %>
+				<br />
+				<small id="eDateErr" class="err"><%= eDateErr%></small>
+			<% } %>
+			<% if (dateConflictErr !== "") { %>
+				<br />
+				<small id="dateConflictErr" class="err"><%= dateConflictErr%></small>
+			<% } %>
+		</div>
+		<div class="form-group" id="transfer-type-specification">
+			<label for="transfer_type">Transfer type: </label>
+			<select class="form-control" id="transfer_type" name="transfer_type" style="width: 150px; display: inline-flex">
+				<option value="deliver" <%=transfer_type === 'deliver' ? 'selected' : ''%>>deliver</option>
+				<option value="pick-up" <%=transfer_type === 'pick-up' ? 'selected' : ''%>>pick-up</option>
+				<option value="transfer at building" <%=transfer_type === 'transfer at building' ? 'selected' : ''%>>transfer at the PSC building</option>
+			</select>
+			<label for="payment_method" style="padding-left: 30px">Payment method: </label>
+			<select class="form-control" id="payment_method" name="payment_method" style="width: 150px; display: inline-flex">
+				<option value="card" <%=payment_method === 'card' ? 'selected' : ''%>>card</option>
+				<option value="cash" <%=payment_method === 'cash' ? 'selected' : ''%>>cash</option>
+			</select>
+		</div>
+		<button type="submit" class="btn btn-primary">Submit request</button>
+	</form>
+  </body>
+</html>

@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LogIn</title>
+
+    <link rel="stylesheet" href="../public/stylesheets/login.css">
+    <script src="../routes/login.js"></script>
+</head>
+
+<body>
+    <div class="topnav">
+        <div class="title">Team 66 Pet Care</div>
+    </div>
+
+    <div class="login">
+ 
+    <form method="post" action="login.js">
+ 
+        <p><label class="label_input">username</label><input type="text" id="username" class="text_field" name="1" /></p>
+        <p><label class="label_input">password</label><input type="password" id="password" class="text_field" name="2" /></p>
+ 
+        <div id="login_control">
+            <input type="submit" id="btn_login" value="login" οnclick="login();"/>
+        </div>
+    </form>
+    </div>
+</body>
+</html>

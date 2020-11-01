@@ -4,9 +4,6 @@ var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 
-/* --- V7: Using dotenv     --- */
-require('dotenv').config({path: __dirname + '/../.env'});
-
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
 
@@ -21,19 +18,12 @@ var loopsRouter = require('./routes/loops');
 
 /* --- V4: Database Connect --- */
 var selectRouter = require('./routes/select');
-var testRouter = require('./routes/test');
-/* ---------------------------- */
-
-/* --- V5: Adding Forms     --- */
-var formsRouter = require('./routes/forms');
-/* ---------------------------- */
-
-/* --- V6: Modify Database  --- */
-var insertRouter = require('./routes/insert');
 /* ---------------------------- */
 
 /* --- Pet Owner -------------- */
 var newPetRouter = require('./routes/new_pet');
+var newRequestRouter = require('./routes/new_request');
+var newTransactionRouter = require('./routes/handle_transactions');
 
 /* --- Pet  -------------- */
 var petRouter = require('./routes/pet');
@@ -65,22 +55,12 @@ app.use('/loops', loopsRouter);
 
 /* --- V4: Database Connect --- */
 app.use('/select', selectRouter);
-app.use('/test', testRouter);
-/* ---------------------------- */
-
-/* --- V5: Adding Forms     --- */
-app.use('/forms', formsRouter);
-/* ---------------------------- */
-
-/* --- V6: Modify Database  --- */
-var bodyParser = require('body-parser');
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true }));
-app.use('/insert', insertRouter);
 /* ---------------------------- */
 
 /* --- Pet Owner -------------- */
 app.use('/new_pet', newPetRouter);
+app.use('/new_request', newRequestRouter);
+app.use('/handle_transactions', newTransactionRouter);
 
 /* --- Pet  -------------- */
 app.use('/pet', petRouter);
