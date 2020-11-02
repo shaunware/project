@@ -11,6 +11,7 @@ var all_petowner_query = 'SELECT 1 FROM PetOwners';
 var petowner_exist_query = 'SELECT 1 FROM PetOwners WHERE userid=$1';
 var pet_exist_query = 'SELECT * FROM Pets WHERE petid=$1 AND owner=$2';
 var request_exist_query = 'SELECT s_date, e_date, transfer_type, payment_type FROM Requests WHERE pet_id=$1 AND s_date=$2';
+var confirmed_transaction_query = 'SELECT 1 FROM Transactions WHERE pet_id=$1 AND s_date=$2 AND status=\'Confirmed\'';
 var existing_transaction_query = 'SELECT T.ct_id AS ct_id, T.cost AS cost, C.rating AS rating, T.status AS status,\n' +
 	'       CASE WHEN EXISTS(SELECT 1 FROM FullTimeCareTakers F WHERE F.userid=C.userid) THEN \'Full time\' ELSE \'Part time\' END AS ct_category\n' +
 	'  FROM Transactions T INNER JOIN CareTakers C ON T.ct_id=C.userid\n' +
@@ -21,6 +22,9 @@ SELECT T.ct_id AS ct_id, T.cost AS cost, C.rating AS rating, T.status AS status,
   FROM Transactions T INNER JOIN CareTakers C ON T.ct_id=C.userid
   WHERE T.pet_id={$1=this petid} AND T.s_date={$2=this s_date} AND T.status<>'Withdrawn'
  */
+var request_all_query = () => {
+	return 'SELECT send_request_success($11, $2, CT.userid) FROM (' + retrieve_ct_query() + safe_guard + ') CT';
+}
 var retrieve_ct_query = () => {
 	var res = all_ct_query;
 	if (id_contains !== "") { res = res + ct_id_filter; }
@@ -209,6 +213,11 @@ router.get('/:userid/:petid/:s_date', function(req, res, next) {
 							petName = pet[0].name;
 							category = pet[0].category;
 							pool.query(request_exist_query, [petid, getString(s_date)], (err, data) => {
+								pool.query(confirmed_transaction_query, [petid, getString(s_date)], (err, data) => {
+									if (data.rows.length > 0) {
+										res.redirect('/test'); // TODO: Replace with actual transaction page
+									}
+								})
 								if (data.rows.length > 0) {
 									var request = data.rows[0];
 									e_date = request.e_date;
@@ -306,7 +315,10 @@ router.post('/:userid/:petid/:s_date/request_all', function(req, res, next) {
 	my_avg_rate = req.body.my_avg_rate;
 	pet_coll = req.body.pet_coll;
 	allocate_unsuccessful = false;
-	redirectHere(res);
+	pool.query(request_all_query(), [category, getString(s_date), getString(e_date), id_contains, name_contains, avg_rate, daily_price, pc_avg_rate, userid, my_avg_rate, petid], (err, data) => {
+		console.log(err);
+		redirectHere(res);
+	})
 });
 
 router.post('/:userid/:petid/:s_date/:ct_id/request', function(req, res, next) {
@@ -328,7 +340,6 @@ router.post('/:userid/:petid/:s_date/:ct_id/request', function(req, res, next) {
 	pet_coll = req.body.pet_coll;
 	allocate_unsuccessful = false;
 	pool.query(individual_request_query, [petid, getString(s_date), ct_id], (err, data) => {
-		console.log(err);
 		if (data.rows[0].send_request_success) {
 			console.log("Transaction confirmed");
 			res.redirect('/test'); // TODO: Should direct to the view request page.
