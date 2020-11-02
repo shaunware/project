@@ -25,6 +25,8 @@ SELECT T.ct_id AS ct_id, T.cost AS cost, C.rating AS rating, T.status AS status,
 var request_all_query = () => {
 	return 'SELECT send_request_success($11, $2, CT.userid) FROM (' + retrieve_ct_query() + safe_guard + ') CT';
 }
+var clear_all_query = 'UPDATE Transactions T1 SET status=\'Outdated\' WHERE status=\'Pending\' AND EXISTS(\n' +
+	'    SELECT 1 FROM Transactions T2 WHERE T1.pet_id=T2.pet_id AND T1.s_date=T2.s_date AND T2.status=\'Confirmed\')'
 var retrieve_ct_query = () => {
 	var res = all_ct_query;
 	if (id_contains !== "") { res = res + ct_id_filter; }
@@ -316,8 +318,9 @@ router.post('/:userid/:petid/:s_date/request_all', function(req, res, next) {
 	pet_coll = req.body.pet_coll;
 	allocate_unsuccessful = false;
 	pool.query(request_all_query(), [category, getString(s_date), getString(e_date), id_contains, name_contains, avg_rate, daily_price, pc_avg_rate, userid, my_avg_rate, petid], (err, data) => {
-		console.log(err);
-		redirectHere(res);
+		pool.query(clear_all_query, (err, data) => {
+			redirectHere(res);
+		})
 	})
 });
 
