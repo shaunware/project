@@ -101,7 +101,7 @@
 	</div>
     <form id="html_form" role="form" method="post">
 		<button type="submit" class="btn btn-primary" formaction="<%=s_date%>/allocate">Allocate any care taker to me</button>
-		<button type="submit" class="btn btn-primary" formaction="<%=s_date%>/request_all">Send request to all care takers in the filtered list</button> <!-- TODO: Should be handled with a form and post method -->
+		<button type="submit" class="btn btn-primary" formaction="<%=s_date%>/request_all">Send request to all care takers in the filtered list</button>
 		<button type="button" class="btn btn-primary" id="show-filter-btn" onclick="toggleFilter()"><%=toggle_filter==='none' ? 'Show' : 'Hide'%> filter panel</button>
 		<input id="toggle_filter" name="toggle_filter" type="hidden" value="<%=toggle_filter%>">
 		<% if (allocate_unsuccessful_msg !== "") { %>
