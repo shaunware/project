@@ -97,7 +97,7 @@ SELECT CTC.ct_id
 var delete_request_query = 'DELETE FROM Requests WHERE pet_id=$1 AND s_date=$2';
 var delete_empty_request_qeury = 'CALL delete_empty_request($1, $2)';
 var withdraw_query = 'UPDATE Transactions SET status=\'Withdrawn\' WHERE pet_id=$1 AND s_date=$2 AND ct_id=$3';
-var individual_request_query = 'CALL send_request($1, $2, $3)'; // $1=petid, $2=s_date, $3=ct_id
+var individual_request_query = 'SELECT send_request_success($1, $2, $3)'; // $1=petid, $2=s_date, $3=ct_id
 
 /* Data */
 var userid;
@@ -329,7 +329,12 @@ router.post('/:userid/:petid/:s_date/:ct_id/request', function(req, res, next) {
 	allocate_unsuccessful = false;
 	pool.query(individual_request_query, [petid, getString(s_date), ct_id], (err, data) => {
 		console.log(err);
-		redirectHere(res);
+		if (data.rows[0].send_request_success) {
+			console.log("Transaction confirmed");
+			res.redirect('/test'); // TODO: Should direct to the view request page.
+		} else {
+			redirectHere(res);
+		}
 	});
 })
 
