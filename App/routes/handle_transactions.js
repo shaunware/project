@@ -338,5 +338,25 @@ router.post('/:userid/:petid/:s_date/:ct_id/request', function(req, res, next) {
 	});
 })
 
+router.post('/:userid/:petid/:s_date/show_filtered', function(req, res, next) {
+	userid = req.params.userid;
+	petid = req.params.petid;
+	s_date = new Date(req.params.s_date);
+	toggle_filter = req.body.toggle_filter;
+	id_contains = req.body.ct_id_contains.trim();
+	name_contains = req.body.ct_name_contains.trim();
+	ft_pt = req.body.ft_pt;
+	avg_rate = req.body.avg_rate;
+	can_take_care = req.body.can_take_care;
+	daily_price = req.body.daily_price;
+	pc_experience = req.body.pc_experience;
+	pc_avg_rate = req.body.pc_avg_rate;
+	user_coll = req.body.user_coll;
+	my_avg_rate = req.body.my_avg_rate;
+	pet_coll = req.body.pet_coll;
+	allocate_unsuccessful = false;
+	redirectHere(res);
+});
+
 module.exports = router;
 
