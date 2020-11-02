@@ -36,6 +36,7 @@ var insertRouter = require('./routes/insert');
 var newPetRouter = require('./routes/new_pet');
 var newRequestRouter = require('./routes/new_request');
 var newTransactionRouter = require('./routes/handle_transactions');
+var requestRouter = require('./routes/request');
 
 var app = express();
 
@@ -81,6 +82,7 @@ app.use('/insert', insertRouter);
 app.use('/new_pet', newPetRouter);
 app.use('/new_request', newRequestRouter);
 app.use('/handle_transactions', newTransactionRouter);
+app.use('/request', requestRouter);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
