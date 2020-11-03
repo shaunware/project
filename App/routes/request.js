@@ -10,7 +10,7 @@ var getString = (date) => date.getFullYear() + "-" + (date.getMonth() + 1) + "-"
 
 var renderTransaction = (res) => {
 	res.render('transaction', {
-		title: 'Transaction of your ',
+		title: 'Transaction',
 		petid: petid,
 		s_date: getString(s_date),
 		e_date: getString(transaction.e_date),
@@ -20,15 +20,19 @@ var renderTransaction = (res) => {
 
 var renderRequest = (res) => {
 	res.render('request', {
-		title: 'Request of your ',
+		title: 'Request',
+		userid: userid,
 		petid: petid,
-		s_date: getString(s_date)
+		s_date: getString(s_date),
+		e_date: getString(request.e_date),
+		pet: pet,
+		request: request
 	})
 }
 
 /* SQL Query */
 var petowner_exist_query = 'SELECT 1 FROM PetOwners WHERE userid=$1'
-var pet_exist_query = 'SELECT 1 FROM Pets WHERE petid=$1 AND owner=$2';
+var pet_exist_query = 'SELECT * FROM Pets WHERE petid=$1 AND owner=$2';
 var request_exist_query = 'SELECT * FROM Requests WHERE pet_id=$1 AND s_date=$2'
 var confirmed_transaction_exist_query = 'SELECT T.pet_id AS pet_id, T.s_date AS s_date, R.e_date AS e_date, T.ct_id AS ct_id, P.name AS pet_name, P.category AS pet_category,\n' +
 	'  R.transfer_type AS transfer_type, R.payment_type AS payment_type, T.cost AS cost, T.rate AS rate, T.review AS review\n' +
@@ -48,6 +52,7 @@ var save_review_query = 'UPDATE Transactions SET review=$1 WHERE pet_id=$2 AND s
 var userid;
 var petid;
 var s_date;
+var pet;
 var transaction;
 var request;
 
@@ -65,9 +70,10 @@ router.get('/:userid/:petid/:s_date', function(req, res, next) {
 				s_date = new Date(req.params.s_date);
 				pool.query(pet_exist_query, [petid, userid], (err, data) => {
 					if (data.rows.length > 0) {
-						request = data.rows[0];
+						pet = data.rows[0];
 						pool.query(request_exist_query, [petid, getString(s_date)], (err, data) => {
 							if (data.rows.length > 0) {
+								request = data.rows[0];
 								pool.query(confirmed_transaction_exist_query, [petid, getString(s_date)], (err, data) => {
 									if (data.rows.length > 0) {
 										transaction = data.rows[0];

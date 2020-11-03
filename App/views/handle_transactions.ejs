@@ -90,7 +90,7 @@
 				<tr>
 					<td><%= existing_transactions[i].ct_id%></td>
 					<td><%= existing_transactions[i].ct_category%></td>
-					<td><%= existing_transactions[i].rating%></td>
+					<td><%= Math.round(existing_transactions[i].rating * 10) / 10%></td>
 					<td><%= existing_transactions[i].cost%></td>
 					<td><%= existing_transactions[i].status%></td>
 					<td><button type="submit" class="btn btn-secondary" form="html_form" formaction="<%=s_date%>/<%=existing_transactions[i].ct_id%>/withdraw" <%= existing_transactions[i].status === 'Declined' ? 'disabled' : ''%>>Withdraw</button></td>

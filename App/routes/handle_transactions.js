@@ -285,7 +285,7 @@ router.post('/:userid/:petid/:s_date/back', function (req, res, next) {
 	s_date = new Date(req.params.s_date);
 	allocate_unsuccessful = false;
 	pool.query(delete_empty_request_qeury, [petid, s_date], (err, data) => {
-		res.redirect('/test'); //TODO: Redirect to the view request page
+		res.redirect('/request/' + userid + '/' + petid + '/' + s_date); //TODO: Redirect to the view request page
 	})
 })
 
