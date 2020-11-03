@@ -17,9 +17,11 @@ var renderRequest = (res) => {
 
 var renderTransaction = (res) => {
 	res.render('transaction', {
-		title: 'Your transaction of ' + petid + ' from ' + getString(s_date),
+		title: 'Transaction of your ',
 		petid: petid,
-		s_date: getString(s_date)
+		s_date: getString(s_date),
+		e_date: getString(transaction.e_date),
+		transaction: transaction
 	})
 }
 
@@ -27,12 +29,24 @@ var renderTransaction = (res) => {
 var petowner_exist_query = 'SELECT 1 FROM PetOwners WHERE userid=$1'
 var pet_exist_query = 'SELECT 1 FROM Pets WHERE petid=$1 AND owner=$2';
 var request_exist_query = 'SELECT 1 FROM Requests WHERE pet_id=$1 AND s_date=$2'
-var confirmed_transaction_exist_query = 'SELECT 1 FROM Transactions WHERE pet_id=$1 AND s_date=$2 AND status=\'Confirmed\'';
+var confirmed_transaction_exist_query = 'SELECT T.pet_id AS pet_id, T.s_date AS s_date, R.e_date AS e_date, T.ct_id AS ct_id, P.name AS pet_name, P.category AS pet_category,\n' +
+	'  R.transfer_type AS transfer_type, R.payment_type AS payment_type, T.cost AS cost, T.rate AS rate, T.review AS review\n' +
+	'FROM (Transactions T NATURAL JOIN Requests R) INNER JOIN Pets P ON R.pet_id=P.petid\n' +
+	'WHERE pet_id=$1 AND s_date=$2 AND status=\'Confirmed\'';
+/*
+SELECT T.pet_id AS pet_id, T.s_date AS s_date, R.e_date AS e_date, T.ct_id AS ct_id, P.name AS pet_name, P.category AS pet_category,
+  R.transfer_type AS transfer_type, R.payment_type AS payment_type, T.cost AS cost, T.rate AS rate, T.review AS review
+FROM (Transactions T NATURAL JOIN Requests R) INNER JOIN Pets P ON R.pet_id=P.petid
+WHERE pet_id=$1 AND s_date=$2 AND status='Confirmed'
+ */
+var save_rate_query = 'UPDATE Transactions SET rate=$1 WHERE pet_id=$2 AND s_date=$3 AND status=\'Confirmed\'';
+var save_review_query = 'UPDATE Transactions SET review=$1 WHERE pet_id=$2 AND s_date=$3 AND status=\'Confirmed\'';
 
 /* Data */
 var userid;
 var petid;
 var s_date;
+var transaction;
 
 /* Err msg */
 
@@ -52,8 +66,10 @@ router.get('/:userid/:petid/:s_date', function(req, res, next) {
 							if (data.rows.length > 0) {
 								pool.query(confirmed_transaction_exist_query, [petid, getString(s_date)], (err, data) => {
 									if (data.rows.length > 0) {
+										transaction = data.rows[0];
 										renderTransaction(res);
 									} else {
+										transaction = null;
 										renderRequest(res);
 									}
 								})
@@ -73,8 +89,20 @@ router.get('/:userid/:petid/:s_date', function(req, res, next) {
 });
 
 // POST
-router.post('/:userid', function(req, res, next) {
-
+router.post('/:userid/:petid/:s_date', function(req, res, next) {
+	userid = req.params.userid; //TODO: Need to replace with user session id
+	petid = req.params.petid;
+	s_date = new Date(req.params.s_date);
+	var rate = req.body.rate;
+	var review = req.body.review;
+	pool.query(save_rate_query, [rate, petid, getString(s_date)], (err, data) => {
+		console.log("Update rate to " + rate);
+		console.log(err);
+		pool.query(save_review_query, [review, petid, getString(s_date)], (err, data) => {
+			console.log("Update review");
+			res.redirect("/request/" + userid + "/" + petid + "/" + getString(s_date));
+		})
+	});
 });
 
 module.exports = router;
