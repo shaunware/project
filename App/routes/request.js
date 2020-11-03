@@ -89,7 +89,7 @@ router.get('/:userid/:petid/:s_date', function(req, res, next) {
 });
 
 // POST
-router.post('/:userid/:petid/:s_date', function(req, res, next) {
+router.post('/:userid/:petid/:s_date/review', function(req, res, next) {
 	userid = req.params.userid; //TODO: Need to replace with user session id
 	petid = req.params.petid;
 	s_date = new Date(req.params.s_date);
@@ -97,7 +97,6 @@ router.post('/:userid/:petid/:s_date', function(req, res, next) {
 	var review = req.body.review;
 	pool.query(save_rate_query, [rate, petid, getString(s_date)], (err, data) => {
 		console.log("Update rate to " + rate);
-		console.log(err);
 		pool.query(save_review_query, [review, petid, getString(s_date)], (err, data) => {
 			console.log("Update review");
 			res.redirect("/request/" + userid + "/" + petid + "/" + getString(s_date));
