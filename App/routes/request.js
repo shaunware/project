@@ -5,15 +5,8 @@ require('dotenv').config({path: __dirname + '/../.env'});
 const { Pool } = require('pg')
 const pool = new Pool({connectionString:process.env.DATABASE_URL})
 
+/* Util */
 var getString = (date) => date.getFullYear() + "-" + (date.getMonth() + 1) + "-" + date.getDate();
-
-var renderRequest = (res) => {
-	res.render('request', {
-		title: 'Your request of ' + petid + ' from ' + getString(s_date),
-		petid: petid,
-		s_date: getString(s_date)
-	});
-}
 
 var renderTransaction = (res) => {
 	res.render('transaction', {
@@ -25,10 +18,18 @@ var renderTransaction = (res) => {
 	})
 }
 
+var renderRequest = (res) => {
+	res.render('request', {
+		title: 'Request of your ',
+		petid: petid,
+		s_date: getString(s_date)
+	})
+}
+
 /* SQL Query */
 var petowner_exist_query = 'SELECT 1 FROM PetOwners WHERE userid=$1'
 var pet_exist_query = 'SELECT 1 FROM Pets WHERE petid=$1 AND owner=$2';
-var request_exist_query = 'SELECT 1 FROM Requests WHERE pet_id=$1 AND s_date=$2'
+var request_exist_query = 'SELECT * FROM Requests WHERE pet_id=$1 AND s_date=$2'
 var confirmed_transaction_exist_query = 'SELECT T.pet_id AS pet_id, T.s_date AS s_date, R.e_date AS e_date, T.ct_id AS ct_id, P.name AS pet_name, P.category AS pet_category,\n' +
 	'  R.transfer_type AS transfer_type, R.payment_type AS payment_type, T.cost AS cost, T.rate AS rate, T.review AS review\n' +
 	'FROM (Transactions T NATURAL JOIN Requests R) INNER JOIN Pets P ON R.pet_id=P.petid\n' +
@@ -42,11 +43,13 @@ WHERE pet_id=$1 AND s_date=$2 AND status='Confirmed'
 var save_rate_query = 'UPDATE Transactions SET rate=$1 WHERE pet_id=$2 AND s_date=$3 AND status=\'Confirmed\'';
 var save_review_query = 'UPDATE Transactions SET review=$1 WHERE pet_id=$2 AND s_date=$3 AND status=\'Confirmed\'';
 
+
 /* Data */
 var userid;
 var petid;
 var s_date;
 var transaction;
+var request;
 
 /* Err msg */
 
@@ -62,6 +65,7 @@ router.get('/:userid/:petid/:s_date', function(req, res, next) {
 				s_date = new Date(req.params.s_date);
 				pool.query(pet_exist_query, [petid, userid], (err, data) => {
 					if (data.rows.length > 0) {
+						request = data.rows[0];
 						pool.query(request_exist_query, [petid, getString(s_date)], (err, data) => {
 							if (data.rows.length > 0) {
 								pool.query(confirmed_transaction_exist_query, [petid, getString(s_date)], (err, data) => {
