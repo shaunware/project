@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+  <head>
+		<!-- Page Title -->
+    <title><%= title%></title>
+    <link rel='stylesheet' href='/stylesheets/style.css' />
+		
+		<!-- CSS for Styling -->
+		<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css" integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS" crossorigin="anonymous">
+		
+		<!-- JavaScript for Interactivity -->
+		<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.6/umd/popper.min.js" integrity="sha384-wHAiFfRlMFy6i5SRaxvfOCifBUQy1xHdJ/yoi7FRNXMRBu5WHdZYu1hA6ZOblgut" crossorigin="anonymous"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/js/bootstrap.min.js" integrity="sha384-B0UglyR+jN6CkvvICOB2joaf5I4l3gm9GU6Hc1og6Ls7i6U/mkkaduKaBhlAXv9k" crossorigin="anonymous"></script>
+	  <script>
+	  </script>
+  </head>
+  <body>
+    <h1><%= title%> of your <%=pet.category%> <%=pet.name%> from <%=s_date%> to <%=e_date%></h1>
+	<div id="header-btn">
+		<a href="../../../test"><button class="btn btn-secondary">Edit pet profile</button></a> <!-- TODO: Change to actual edit path -->
+		<a href="../../../test"><button class="btn btn-secondary">Edit request details</button></a> <!-- TODO: Change to actual edit request path -->
+		<a href="../../../handle_transactions/<%=userid%>/<%=petid%>/<%=s_date%>"><button class="btn btn-secondary">Find care takers</button></a>
+		<a href="../../../test"><button class="btn btn-secondary">Back</button></a> <!-- TODO: Change to actual pet path -->
+	</div>
+	<br />
+    <div id="request-info">
+		<p id="pet-info">
+			<b>Pet ID: </b><%=pet.petid%>
+			<span style="padding-left: 30px"></span>
+			<b>Pet Name: </b><%=pet.name%>
+			<span style="padding-left: 30px"></span>
+			<b>Pet category: </b><%=pet.category%>
+		</p>
+		<p id="time-info">
+			<b>Start date: </b><%=s_date%>
+			<span style="padding-left: 30px"></span>
+			<b>End date: </b><%=e_date%>
+		</p>
+		<p id="transaction-detail">
+			<b>Transfer type: </b><%=request.transfer_type%>
+			<span style="padding-left: 30px"></span>
+			<b>Payment method: </b><%=request.payment_type%>
+		</p>
+	</div>
+    <div id="existing-transactions-info">
+		<table class="table">
+			<thead>
+				<tr><th colspan="5">All transactions you have sent</th></tr>
+				<tr>
+					<th scope="col">Care taker ID</th>
+					<th scope="col">Care taker name</th>
+					<th scope="col">Cost</th>
+					<th scope="col">Status</th>
+					<th scope="col"><!-- View --></th>
+				</tr>
+			</thead>
+			<tbody>
+				<% for (var i=0; i<caretakers.length; i++) { %>
+					<tr>
+						<td><%=caretakers[i].ct_id%></td>
+						<td><%=caretakers[i].name%></td>
+						<td><%=caretakers[i].cost%></td>
+						<td><%=caretakers[i].status%></td>
+						<td><a href="../../../test" target="_blank"><button type="button" class="btn btn-secondary">View profile</button></a></td> <!-- TODO: Change to actual view path -->
+					</tr>
+				<% } %>
+			</tbody>
+		</table>
+	</div>
+  </body>
+</html>

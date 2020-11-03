@@ -60,17 +60,41 @@
 			  toggleUserColl();
 		  }
 		  window.onload = initializeWindow;
+		  const toggleEdit = () => {
+		  	document.getElementById("save-edit").style.display = "inline";
+		  	document.getElementById("edit-btn").style.display = "none";
+		  	document.getElementById("request-display").style.display = "none";
+		  	document.getElementById("request-form").style.display = "block";
+		  }
 	  </script>
   </head>
   <body>
     <h1><%= title%></h1>
-	<a href="../../../test"><button class="btn btn-secondary">Edit request</button></a> <!-- TODO: Change to actual edit path -->
+	<p><b>Start date: </b><%= s_date%><span style="padding-left: 30px"></span><b>End date: </b><%= e_date%></p>
+	<button class="btn btn-secondary" type="button" id="edit-btn" onclick="toggleEdit()">Edit request</button>
+	<button class="btn btn-secondary" form="html_form" style="display: none" type="submit" id="save-edit" formaction="<%=s_date%>/edit">Save changes</button>
 	<button class="btn btn-secondary" form="html_form" formaction="<%=s_date%>/delete">Delete request</button>
 	<button class="btn btn-secondary" form="html_form" formaction="<%=s_date%>/back">Back</button>
 	<br /><br />
 	<div id="request-info">
-		<p><b>Start date: </b><%= s_date%><span style="padding-left: 30px"></span><b>End date: </b><%= e_date%></p>
-		<p><b>Transfer type: </b><%= transfer_type%><span style="padding-left: 30px"></span> <b>Payment method: </b><%= payment_method%></p>
+		<div id="request-display">
+			<p><b>Transfer type: </b><%= transfer_type%></p>
+			<p><b>Peyment method: </b><%= payment_method%></p>
+		</div>
+		<div id="request-form" style="display: none">
+			<label for="select-transfer-type">Transfer type: </label>
+			<select name="transfer" class="form-control" style="width: 30%; display: inline-flex" id="select-transfer-type">
+				<option value="deliver" <%=transfer_type === 'deliver' ? 'selected' : ''%>>deliver</option>
+				<option value="pick-up" <%=transfer_type === 'pick-up' ? 'selected' : ''%>>pick-up</option>
+				<option value="transfer at building" <%=transfer_type === 'transfer at building' ? 'selected' : ''%>>transfer at the PSC building</option>
+			</select>
+			<br />
+			<label for="select-payment-method">Paymen method: </label>
+			<select name="payment" class="form-control" style="width: 30%; display: inline-flex" id="select-payment-method">
+				<option value="card" <%=payment_method === 'card' ? 'selected' : ''%>>card</option>
+				<option value="cash" <%=payment_method === 'cash' ? 'selected' : ''%>>cash</option>
+			</select>
+		</div>
 	</div>
 	<div id="existing-list">
 		<table class="table">
@@ -90,7 +114,7 @@
 				<tr>
 					<td><%= existing_transactions[i].ct_id%></td>
 					<td><%= existing_transactions[i].ct_category%></td>
-					<td><%= existing_transactions[i].rating%></td>
+					<td><%= Math.round(existing_transactions[i].rating * 10) / 10%></td>
 					<td><%= existing_transactions[i].cost%></td>
 					<td><%= existing_transactions[i].status%></td>
 					<td><button type="submit" class="btn btn-secondary" form="html_form" formaction="<%=s_date%>/<%=existing_transactions[i].ct_id%>/withdraw" <%= existing_transactions[i].status === 'Declined' ? 'disabled' : ''%>>Withdraw</button></td>
@@ -101,7 +125,7 @@
 	</div>
     <form id="html_form" role="form" method="post">
 		<button type="submit" class="btn btn-primary" formaction="<%=s_date%>/allocate">Allocate any care taker to me</button>
-		<button type="submit" class="btn btn-primary" formaction="<%=s_date%>/request_all">Send request to all care takers in the filtered list</button> <!-- TODO: Should be handled with a form and post method -->
+		<button type="submit" class="btn btn-primary" formaction="<%=s_date%>/request_all">Send request to all care takers in the filtered list</button>
 		<button type="button" class="btn btn-primary" id="show-filter-btn" onclick="toggleFilter()"><%=toggle_filter==='none' ? 'Show' : 'Hide'%> filter panel</button>
 		<input id="toggle_filter" name="toggle_filter" type="hidden" value="<%=toggle_filter%>">
 		<% if (allocate_unsuccessful_msg !== "") { %>
@@ -161,6 +185,7 @@
 					</div>
 				</div>
 			</div>
+			<button type="submit" class="btn btn-primary" formaction="<%=s_date%>/show_filtered">Show filter results</button>
 		</div>
 		<br /><br />
 		<div id="ct-list">
@@ -182,9 +207,9 @@
 						<td><%=care_takers[i].userid%></td>
 						<td><%=care_takers[i].name%></td>
 						<td><%=care_takers[i].category%></td>
-						<td><%=care_takers[i].rating%></td>
+						<td><%=Math.round(care_takers[i].rating * 10) / 10%></td>
 						<td><%=care_takers[i].daily_price%></td>
-						<td>Request</td> <!-- TODO: Handle form submit request -->
+						<td><button type="submit" class="btn btn-primary" formaction="<%=s_date%>/<%=care_takers[i].userid%>/request">Request</button></td>
 					</tr>
 				<% } %>
 				</tbody>

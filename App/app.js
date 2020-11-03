@@ -24,6 +24,7 @@ var selectRouter = require('./routes/select');
 var newPetRouter = require('./routes/new_pet');
 var newRequestRouter = require('./routes/new_request');
 var newTransactionRouter = require('./routes/handle_transactions');
+var requestRouter = require('./routes/request');
 
 /* --- Pet  -------------- */
 var petRouter = require('./routes/pet');
@@ -61,6 +62,7 @@ app.use('/select', selectRouter);
 app.use('/new_pet', newPetRouter);
 app.use('/new_request', newRequestRouter);
 app.use('/handle_transactions', newTransactionRouter);
+app.use('/request', requestRouter);
 
 /* --- Pet  -------------- */
 app.use('/pet', petRouter);

@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html>
+  <head>
+		<!-- Page Title -->
+    <title><%= title%></title>
+    <link rel='stylesheet' href='/stylesheets/style.css' />
+		
+		<!-- CSS for Styling -->
+		<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css" integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS" crossorigin="anonymous">
+		
+		<!-- JavaScript for Interactivity -->
+		<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.6/umd/popper.min.js" integrity="sha384-wHAiFfRlMFy6i5SRaxvfOCifBUQy1xHdJ/yoi7FRNXMRBu5WHdZYu1hA6ZOblgut" crossorigin="anonymous"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/js/bootstrap.min.js" integrity="sha384-B0UglyR+jN6CkvvICOB2joaf5I4l3gm9GU6Hc1og6Ls7i6U/mkkaduKaBhlAXv9k" crossorigin="anonymous"></script>
+	  <script>
+		  const toggleForm = () => {
+			  let f = document.getElementById("review-form");
+			  let b = document.getElementById("toggle-form-btn");
+			  if (f.style.display === "none") {
+				  f.style.display = "block";
+				  b.innerText = "Cancel this review";
+			  } else {
+				  f.style.display = "none";
+				  b.innerText = "Edit review";
+			  }
+		  }
+	  </script>
+  </head>
+  <body>
+    <h1><%= title%> of your <%=transaction.pet_category%> <%=transaction.pet_name%> from <%=s_date%> to <%=e_date%></h1>
+	<div id="header-btn-group">
+		<a href="../../../test"><button class="btn btn-secondary">Edit pet profile</button></a> <!-- TODO: Change to actual edit path -->
+		<a href="../../../test"><button class="btn btn-secondary">Edit request details</button></a> <!-- TODO: Change to actual edit request path -->
+		<a href="../../../test"><button class="btn btn-secondary">Back</button></a> <!-- TODO: Change to actual pet path -->
+	</div>
+	<br />
+    <div id="transaction-info">
+		<p id="pet-info">
+			<b>Pet ID: </b><%=transaction.pet_id%>
+			<span style="padding-left: 30px"></span>
+			<b>Pet Name: </b><%=transaction.pet_name%>
+			<span style="padding-left: 30px"></span>
+			<b>Pet category: </b><%=transaction.pet_category%>
+		</p>
+		<p id="time-info">
+			<b>Start date: </b><%=s_date%>
+			<span style="padding-left: 30px"></span>
+			<b>End date: </b><%=e_date%>
+		</p>
+		<p id="transaction-detail">
+			<b>Transfer type: </b><%=transaction.transfer_type%>
+			<span style="padding-left: 30px"></span>
+			<b>Payment method: </b><%=transaction.payment_type%>
+			<span style="padding-left: 30px"></span>
+			<b>Cost: </b><%=transaction.cost%>
+		</p>
+		<p id="care-taker">
+			<b>Care Taker: </b><%=transaction.ct_id%>
+			<a href="../../../test" target="_blank"><button type="button" class="btn btn-secondary">View care taker profile</button></a> <!-- TODO: Use actual care taker view path -->
+		</p>
+	</div>
+    <div id="review-info">
+		<% var hasReview = !(transaction.rate === null && transaction.review === null)%>
+		<button type="button" class="btn btn-primary" id="toggle-form-btn" onclick="toggleForm()">Edit review</button>
+		<div id="display-review" style="display: <%=hasReview ? 'block' : 'none'%>">
+			<p><b>My rating: </b><%=transaction.rate%></p>
+			<p><b>Review: </b><%=transaction.review%></p>
+		</div>
+		<div id="review-form" style="display: none">
+			<br />
+			<form id="html_form" role="form" method="post">
+				<div class="form-group">
+					<label for="rate-input">Rate: </label>
+					<input type="number" step="1" class="form-control" id="rate-input" name="rate" style="width: 25%; display: inline-flex" value="<%=transaction.rate%>" placeholder="Rate 1 - 5">
+				</div>
+				<div class="form-group">
+					<label for="review-input">Review: </label>
+					<textarea class="form-control" id="review-input" name="review" placeholder="Please give your review regarding this transaction"><%=transaction.review%></textarea>
+				</div>
+				<button id="save-review" type="submit" class="btn btn-primary" formaction="<%=s_date%>/review">Save review</button>
+			</form>
+		</div>
+	</div>
+  </body>
+</html>
