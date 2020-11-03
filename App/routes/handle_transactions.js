@@ -11,6 +11,7 @@ var all_petowner_query = 'SELECT 1 FROM PetOwners';
 var petowner_exist_query = 'SELECT 1 FROM PetOwners WHERE userid=$1';
 var pet_exist_query = 'SELECT * FROM Pets WHERE petid=$1 AND owner=$2';
 var request_exist_query = 'SELECT s_date, e_date, transfer_type, payment_type FROM Requests WHERE pet_id=$1 AND s_date=$2';
+var confirmed_transaction_query = 'SELECT 1 FROM Transactions WHERE pet_id=$1 AND s_date=$2 AND status=\'Confirmed\'';
 var existing_transaction_query = 'SELECT T.ct_id AS ct_id, T.cost AS cost, C.rating AS rating, T.status AS status,\n' +
 	'       CASE WHEN EXISTS(SELECT 1 FROM FullTimeCareTakers F WHERE F.userid=C.userid) THEN \'Full time\' ELSE \'Part time\' END AS ct_category\n' +
 	'  FROM Transactions T INNER JOIN CareTakers C ON T.ct_id=C.userid\n' +
@@ -21,6 +22,11 @@ SELECT T.ct_id AS ct_id, T.cost AS cost, C.rating AS rating, T.status AS status,
   FROM Transactions T INNER JOIN CareTakers C ON T.ct_id=C.userid
   WHERE T.pet_id={$1=this petid} AND T.s_date={$2=this s_date} AND T.status<>'Withdrawn'
  */
+var request_all_query = () => {
+	return 'SELECT send_request_success($11, $2, CT.userid) FROM (' + retrieve_ct_query() + safe_guard + ') CT';
+}
+var clear_all_query = 'UPDATE Transactions T1 SET status=\'Outdated\' WHERE status=\'Pending\' AND EXISTS(\n' +
+	'    SELECT 1 FROM Transactions T2 WHERE T1.pet_id=T2.pet_id AND T1.s_date=T2.s_date AND T2.status=\'Confirmed\')'
 var retrieve_ct_query = () => {
 	var res = all_ct_query;
 	if (id_contains !== "") { res = res + ct_id_filter; }
@@ -97,6 +103,7 @@ SELECT CTC.ct_id
 var delete_request_query = 'DELETE FROM Requests WHERE pet_id=$1 AND s_date=$2';
 var delete_empty_request_qeury = 'CALL delete_empty_request($1, $2)';
 var withdraw_query = 'UPDATE Transactions SET status=\'Withdrawn\' WHERE pet_id=$1 AND s_date=$2 AND ct_id=$3';
+var individual_request_query = 'SELECT send_request_success($1, $2, $3)'; // $1=petid, $2=s_date, $3=ct_id
 
 /* Data */
 var userid;
@@ -208,6 +215,11 @@ router.get('/:userid/:petid/:s_date', function(req, res, next) {
 							petName = pet[0].name;
 							category = pet[0].category;
 							pool.query(request_exist_query, [petid, getString(s_date)], (err, data) => {
+								pool.query(confirmed_transaction_query, [petid, getString(s_date)], (err, data) => {
+									if (data.rows.length > 0) {
+										res.redirect('/test'); // TODO: Replace with actual transaction page
+									}
+								})
 								if (data.rows.length > 0) {
 									var request = data.rows[0];
 									e_date = request.e_date;
@@ -216,9 +228,7 @@ router.get('/:userid/:petid/:s_date', function(req, res, next) {
 									pool.query(existing_transaction_query, [petid, getString(s_date)], (err, data) => {
 										existing_transactions = data.rows;
 										pool.query(retrieve_ct_query() + safe_guard, [category, getString(s_date), getString(e_date), id_contains, name_contains, avg_rate, daily_price, pc_avg_rate, userid, my_avg_rate, petid], (err, data) => {
-											console.log(err);
 											care_takers = data.rows;
-											console.log(care_takers);
 											refreshPage(res);
 										})
 									})
@@ -245,7 +255,6 @@ router.post('/:userid/:petid/:s_date/allocate', function(req, res, next) {
 	petid = req.params.petid;
 	s_date = new Date(req.params.s_date);
 	pool.query(allocate_query, [petid, getString(s_date), getString(e_date)], (err, data) => {
-		console.log(data.rows[0].allocate_success);
 		if (data.rows[0].allocate_success) {
 			console.log("Allocated the a full-time care taker for request of petid from " + getString(s_date) + " to " + getString(e_date));
 			allocate_unsuccessful = false;
@@ -276,7 +285,7 @@ router.post('/:userid/:petid/:s_date/back', function (req, res, next) {
 	s_date = new Date(req.params.s_date);
 	allocate_unsuccessful = false;
 	pool.query(delete_empty_request_qeury, [petid, s_date], (err, data) => {
-		res.redirect('/test'); //TODO: Redirect to the view request page
+		res.redirect('/request/' + userid + '/' + petid + '/' + s_date); //TODO: Redirect to the view request page
 	})
 })
 
@@ -292,6 +301,58 @@ router.post('/:userid/:petid/:s_date/:ct_id/withdraw', function(req, res, next) 
 })
 
 router.post('/:userid/:petid/:s_date/request_all', function(req, res, next) {
+	userid = req.params.userid;
+	petid = req.params.petid;
+	s_date = new Date(req.params.s_date);
+	toggle_filter = req.body.toggle_filter;
+	id_contains = req.body.ct_id_contains.trim();
+	name_contains = req.body.ct_name_contains.trim();
+	ft_pt = req.body.ft_pt;
+	avg_rate = req.body.avg_rate;
+	can_take_care = req.body.can_take_care;
+	daily_price = req.body.daily_price;
+	pc_experience = req.body.pc_experience;
+	pc_avg_rate = req.body.pc_avg_rate;
+	user_coll = req.body.user_coll;
+	my_avg_rate = req.body.my_avg_rate;
+	pet_coll = req.body.pet_coll;
+	allocate_unsuccessful = false;
+	pool.query(request_all_query(), [category, getString(s_date), getString(e_date), id_contains, name_contains, avg_rate, daily_price, pc_avg_rate, userid, my_avg_rate, petid], (err, data) => {
+		pool.query(clear_all_query, (err, data) => {
+			redirectHere(res);
+		})
+	})
+});
+
+router.post('/:userid/:petid/:s_date/:ct_id/request', function(req, res, next) {
+	userid = req.params.userid;
+	petid = req.params.petid;
+	s_date = new Date(req.params.s_date);
+	var ct_id = req.params.ct_id;
+	toggle_filter = req.body.toggle_filter;
+	id_contains = req.body.ct_id_contains.trim();
+	name_contains = req.body.ct_name_contains.trim();
+	ft_pt = req.body.ft_pt;
+	avg_rate = req.body.avg_rate;
+	can_take_care = req.body.can_take_care;
+	daily_price = req.body.daily_price;
+	pc_experience = req.body.pc_experience;
+	pc_avg_rate = req.body.pc_avg_rate;
+	user_coll = req.body.user_coll;
+	my_avg_rate = req.body.my_avg_rate;
+	pet_coll = req.body.pet_coll;
+	allocate_unsuccessful = false;
+	pool.query(individual_request_query, [petid, getString(s_date), ct_id], (err, data) => {
+		if (data.rows[0].send_request_success) {
+			console.log("Transaction confirmed");
+			res.redirect('/test'); // TODO: Should direct to the view request page.
+		} else {
+			redirectHere(res);
+		}
+	});
+})
+
+router.post('/:userid/:petid/:s_date/show_filtered', function(req, res, next) {
 	userid = req.params.userid;
 	petid = req.params.petid;
 	s_date = new Date(req.params.s_date);
