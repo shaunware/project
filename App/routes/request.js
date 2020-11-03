@@ -47,7 +47,7 @@ WHERE pet_id=$1 AND s_date=$2 AND status='Confirmed'
  */
 var save_rate_query = 'UPDATE Transactions SET rate=$1 WHERE pet_id=$2 AND s_date=$3 AND status=\'Confirmed\'';
 var save_review_query = 'UPDATE Transactions SET review=$1 WHERE pet_id=$2 AND s_date=$3 AND status=\'Confirmed\'';
-var all_ct_query = 'SELECT T.ct_id AS ct_id, U.name AS name, T.status AS status\n' +
+var all_ct_query = 'SELECT T.ct_id AS ct_id, U.name AS name, T.status AS status, T.cost AS cost\n' +
 	'FROM Transactions T INNER JOIN Users U ON U.userid=T.ct_id\n' +
 	'WHERE T.pet_id=$1 AND T.s_date=$2';
 /*

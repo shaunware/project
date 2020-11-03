@@ -180,6 +180,24 @@ var redirectHere = (res) => {
 		}
 	}));
 }
+var readInput = (req) => {
+	userid = req.params.userid;
+	petid = req.params.petid;
+	s_date = new Date(req.params.s_date);
+	toggle_filter = req.body.toggle_filter;
+	id_contains = req.body.ct_id_contains.trim();
+	name_contains = req.body.ct_name_contains.trim();
+	ft_pt = req.body.ft_pt;
+	avg_rate = req.body.avg_rate;
+	can_take_care = req.body.can_take_care;
+	daily_price = req.body.daily_price;
+	pc_experience = req.body.pc_experience;
+	pc_avg_rate = req.body.pc_avg_rate;
+	user_coll = req.body.user_coll;
+	my_avg_rate = req.body.my_avg_rate;
+	pet_coll = req.body.pet_coll;
+	allocate_unsuccessful = false;
+}
 
 /* Err msg */
 var allocate_unsuccessful = false;
@@ -217,7 +235,7 @@ router.get('/:userid/:petid/:s_date', function(req, res, next) {
 							pool.query(request_exist_query, [petid, getString(s_date)], (err, data) => {
 								pool.query(confirmed_transaction_query, [petid, getString(s_date)], (err, data) => {
 									if (data.rows.length > 0) {
-										res.redirect('/test'); // TODO: Replace with actual transaction page
+										res.redirect('/request/' + userid + '/' + petid + '/' + getString(s_date));
 									}
 								})
 								if (data.rows.length > 0) {
@@ -251,14 +269,14 @@ router.get('/:userid/:petid/:s_date', function(req, res, next) {
 // POST
 // ALLOCATE
 router.post('/:userid/:petid/:s_date/allocate', function(req, res, next) {
-	userid = req.params.userid;
+	userid = req.params.userid; //TODO: session id
 	petid = req.params.petid;
 	s_date = new Date(req.params.s_date);
 	pool.query(allocate_query, [petid, getString(s_date), getString(e_date)], (err, data) => {
 		if (data.rows[0].allocate_success) {
 			console.log("Allocated the a full-time care taker for request of petid from " + getString(s_date) + " to " + getString(e_date));
 			allocate_unsuccessful = false;
-			res.redirect('/test'); // TODO: Should direct to the view request page.
+			res.redirect('/request/' + userid + '/' + petid + '/' + getString(s_date));
 		} else {
 			allocate_unsuccessful = true;
 			redirectHere(res);
@@ -285,7 +303,7 @@ router.post('/:userid/:petid/:s_date/back', function (req, res, next) {
 	s_date = new Date(req.params.s_date);
 	allocate_unsuccessful = false;
 	pool.query(delete_empty_request_qeury, [petid, s_date], (err, data) => {
-		res.redirect('/request/' + userid + '/' + petid + '/' + s_date); //TODO: Redirect to the view request page
+		res.redirect('/request/' + userid + '/' + petid + '/' + getString(s_date));
 	})
 })
 
@@ -301,22 +319,7 @@ router.post('/:userid/:petid/:s_date/:ct_id/withdraw', function(req, res, next) 
 })
 
 router.post('/:userid/:petid/:s_date/request_all', function(req, res, next) {
-	userid = req.params.userid;
-	petid = req.params.petid;
-	s_date = new Date(req.params.s_date);
-	toggle_filter = req.body.toggle_filter;
-	id_contains = req.body.ct_id_contains.trim();
-	name_contains = req.body.ct_name_contains.trim();
-	ft_pt = req.body.ft_pt;
-	avg_rate = req.body.avg_rate;
-	can_take_care = req.body.can_take_care;
-	daily_price = req.body.daily_price;
-	pc_experience = req.body.pc_experience;
-	pc_avg_rate = req.body.pc_avg_rate;
-	user_coll = req.body.user_coll;
-	my_avg_rate = req.body.my_avg_rate;
-	pet_coll = req.body.pet_coll;
-	allocate_unsuccessful = false;
+	readInput(req);
 	pool.query(request_all_query(), [category, getString(s_date), getString(e_date), id_contains, name_contains, avg_rate, daily_price, pc_avg_rate, userid, my_avg_rate, petid], (err, data) => {
 		pool.query(clear_all_query, (err, data) => {
 			redirectHere(res);
@@ -325,27 +328,12 @@ router.post('/:userid/:petid/:s_date/request_all', function(req, res, next) {
 });
 
 router.post('/:userid/:petid/:s_date/:ct_id/request', function(req, res, next) {
-	userid = req.params.userid;
-	petid = req.params.petid;
-	s_date = new Date(req.params.s_date);
+	readInput(req);
 	var ct_id = req.params.ct_id;
-	toggle_filter = req.body.toggle_filter;
-	id_contains = req.body.ct_id_contains.trim();
-	name_contains = req.body.ct_name_contains.trim();
-	ft_pt = req.body.ft_pt;
-	avg_rate = req.body.avg_rate;
-	can_take_care = req.body.can_take_care;
-	daily_price = req.body.daily_price;
-	pc_experience = req.body.pc_experience;
-	pc_avg_rate = req.body.pc_avg_rate;
-	user_coll = req.body.user_coll;
-	my_avg_rate = req.body.my_avg_rate;
-	pet_coll = req.body.pet_coll;
-	allocate_unsuccessful = false;
 	pool.query(individual_request_query, [petid, getString(s_date), ct_id], (err, data) => {
 		if (data.rows[0].send_request_success) {
 			console.log("Transaction confirmed");
-			res.redirect('/test'); // TODO: Should direct to the view request page.
+			res.redirect('/request/' + userid + '/' + petid + '/' + getString(s_date));
 		} else {
 			redirectHere(res);
 		}
@@ -353,23 +341,16 @@ router.post('/:userid/:petid/:s_date/:ct_id/request', function(req, res, next) {
 })
 
 router.post('/:userid/:petid/:s_date/show_filtered', function(req, res, next) {
-	userid = req.params.userid;
-	petid = req.params.petid;
-	s_date = new Date(req.params.s_date);
-	toggle_filter = req.body.toggle_filter;
-	id_contains = req.body.ct_id_contains.trim();
-	name_contains = req.body.ct_name_contains.trim();
-	ft_pt = req.body.ft_pt;
-	avg_rate = req.body.avg_rate;
-	can_take_care = req.body.can_take_care;
-	daily_price = req.body.daily_price;
-	pc_experience = req.body.pc_experience;
-	pc_avg_rate = req.body.pc_avg_rate;
-	user_coll = req.body.user_coll;
-	my_avg_rate = req.body.my_avg_rate;
-	pet_coll = req.body.pet_coll;
-	allocate_unsuccessful = false;
+	readInput(req);
 	redirectHere(res);
+});
+
+router.post('/:userid/:petid/:s_date/edit', function(req, res, next) {
+	readInput(req);
+	transfer_type = req.body.transfer;
+	payment_method = req.body.payment;
+	console.log(transfer_type);
+	console.log(payment_method);
 });
 
 module.exports = router;

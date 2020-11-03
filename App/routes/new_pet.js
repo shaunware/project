@@ -142,7 +142,7 @@ router.post('/:userid', function(req, res, next) {
 
 		pool.query(insert_query, (err, data) => {
 			console.log("Inserted new pet: { petid:" + petid + ", name:" + name + ", category:" + category + ", owner:" + owner + ", requirements:" + requirements + "}" )
-			res.redirect('/test'); //TODO: Need to update
+			res.redirect('/test'); //TODO: Need to update to pet view page
 		});
 	} else {
 		res.render('new_pet', {
