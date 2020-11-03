@@ -183,7 +183,7 @@
 						<td><%=care_takers[i].userid%></td>
 						<td><%=care_takers[i].name%></td>
 						<td><%=care_takers[i].category%></td>
-						<td><%=care_takers[i].rating%></td>
+						<td><%=Math.round(care_takers[i].rating * 10) / 10%></td>
 						<td><%=care_takers[i].daily_price%></td>
 						<td><button type="submit" class="btn btn-primary" formaction="<%=s_date%>/<%=care_takers[i].userid%>/request">Request</button></td>
 					</tr>

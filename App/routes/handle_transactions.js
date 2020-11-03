@@ -217,7 +217,7 @@ router.get('/:userid/:petid/:s_date', function(req, res, next) {
 							pool.query(request_exist_query, [petid, getString(s_date)], (err, data) => {
 								pool.query(confirmed_transaction_query, [petid, getString(s_date)], (err, data) => {
 									if (data.rows.length > 0) {
-										res.redirect('/test'); // TODO: Replace with actual transaction page
+										res.redirect('/request/' + userid + '/' + petid + '/' + s_date);
 									}
 								})
 								if (data.rows.length > 0) {
@@ -251,14 +251,14 @@ router.get('/:userid/:petid/:s_date', function(req, res, next) {
 // POST
 // ALLOCATE
 router.post('/:userid/:petid/:s_date/allocate', function(req, res, next) {
-	userid = req.params.userid;
+	userid = req.params.userid; //TODO: session id
 	petid = req.params.petid;
 	s_date = new Date(req.params.s_date);
 	pool.query(allocate_query, [petid, getString(s_date), getString(e_date)], (err, data) => {
 		if (data.rows[0].allocate_success) {
 			console.log("Allocated the a full-time care taker for request of petid from " + getString(s_date) + " to " + getString(e_date));
 			allocate_unsuccessful = false;
-			res.redirect('/test'); // TODO: Should direct to the view request page.
+			res.redirect('/request/' + userid + '/' + petid + '/' + s_date);
 		} else {
 			allocate_unsuccessful = true;
 			redirectHere(res);
@@ -285,7 +285,7 @@ router.post('/:userid/:petid/:s_date/back', function (req, res, next) {
 	s_date = new Date(req.params.s_date);
 	allocate_unsuccessful = false;
 	pool.query(delete_empty_request_qeury, [petid, s_date], (err, data) => {
-		res.redirect('/request/' + userid + '/' + petid + '/' + s_date); //TODO: Redirect to the view request page
+		res.redirect('/request/' + userid + '/' + petid + '/' + s_date);
 	})
 })
 
@@ -345,7 +345,7 @@ router.post('/:userid/:petid/:s_date/:ct_id/request', function(req, res, next) {
 	pool.query(individual_request_query, [petid, getString(s_date), ct_id], (err, data) => {
 		if (data.rows[0].send_request_success) {
 			console.log("Transaction confirmed");
-			res.redirect('/test'); // TODO: Should direct to the view request page.
+			res.redirect('/request/' + userid + '/' + petid + '/' + s_date);
 		} else {
 			redirectHere(res);
 		}
