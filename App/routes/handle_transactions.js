@@ -180,6 +180,24 @@ var redirectHere = (res) => {
 		}
 	}));
 }
+var readInput = (req) => {
+	userid = req.params.userid;
+	petid = req.params.petid;
+	s_date = new Date(req.params.s_date);
+	toggle_filter = req.body.toggle_filter;
+	id_contains = req.body.ct_id_contains.trim();
+	name_contains = req.body.ct_name_contains.trim();
+	ft_pt = req.body.ft_pt;
+	avg_rate = req.body.avg_rate;
+	can_take_care = req.body.can_take_care;
+	daily_price = req.body.daily_price;
+	pc_experience = req.body.pc_experience;
+	pc_avg_rate = req.body.pc_avg_rate;
+	user_coll = req.body.user_coll;
+	my_avg_rate = req.body.my_avg_rate;
+	pet_coll = req.body.pet_coll;
+	allocate_unsuccessful = false;
+}
 
 /* Err msg */
 var allocate_unsuccessful = false;
@@ -301,22 +319,7 @@ router.post('/:userid/:petid/:s_date/:ct_id/withdraw', function(req, res, next) 
 })
 
 router.post('/:userid/:petid/:s_date/request_all', function(req, res, next) {
-	userid = req.params.userid;
-	petid = req.params.petid;
-	s_date = new Date(req.params.s_date);
-	toggle_filter = req.body.toggle_filter;
-	id_contains = req.body.ct_id_contains.trim();
-	name_contains = req.body.ct_name_contains.trim();
-	ft_pt = req.body.ft_pt;
-	avg_rate = req.body.avg_rate;
-	can_take_care = req.body.can_take_care;
-	daily_price = req.body.daily_price;
-	pc_experience = req.body.pc_experience;
-	pc_avg_rate = req.body.pc_avg_rate;
-	user_coll = req.body.user_coll;
-	my_avg_rate = req.body.my_avg_rate;
-	pet_coll = req.body.pet_coll;
-	allocate_unsuccessful = false;
+	readInput(req);
 	pool.query(request_all_query(), [category, getString(s_date), getString(e_date), id_contains, name_contains, avg_rate, daily_price, pc_avg_rate, userid, my_avg_rate, petid], (err, data) => {
 		pool.query(clear_all_query, (err, data) => {
 			redirectHere(res);
@@ -325,23 +328,8 @@ router.post('/:userid/:petid/:s_date/request_all', function(req, res, next) {
 });
 
 router.post('/:userid/:petid/:s_date/:ct_id/request', function(req, res, next) {
-	userid = req.params.userid;
-	petid = req.params.petid;
-	s_date = new Date(req.params.s_date);
+	readInput(req);
 	var ct_id = req.params.ct_id;
-	toggle_filter = req.body.toggle_filter;
-	id_contains = req.body.ct_id_contains.trim();
-	name_contains = req.body.ct_name_contains.trim();
-	ft_pt = req.body.ft_pt;
-	avg_rate = req.body.avg_rate;
-	can_take_care = req.body.can_take_care;
-	daily_price = req.body.daily_price;
-	pc_experience = req.body.pc_experience;
-	pc_avg_rate = req.body.pc_avg_rate;
-	user_coll = req.body.user_coll;
-	my_avg_rate = req.body.my_avg_rate;
-	pet_coll = req.body.pet_coll;
-	allocate_unsuccessful = false;
 	pool.query(individual_request_query, [petid, getString(s_date), ct_id], (err, data) => {
 		if (data.rows[0].send_request_success) {
 			console.log("Transaction confirmed");
@@ -353,22 +341,7 @@ router.post('/:userid/:petid/:s_date/:ct_id/request', function(req, res, next) {
 })
 
 router.post('/:userid/:petid/:s_date/show_filtered', function(req, res, next) {
-	userid = req.params.userid;
-	petid = req.params.petid;
-	s_date = new Date(req.params.s_date);
-	toggle_filter = req.body.toggle_filter;
-	id_contains = req.body.ct_id_contains.trim();
-	name_contains = req.body.ct_name_contains.trim();
-	ft_pt = req.body.ft_pt;
-	avg_rate = req.body.avg_rate;
-	can_take_care = req.body.can_take_care;
-	daily_price = req.body.daily_price;
-	pc_experience = req.body.pc_experience;
-	pc_avg_rate = req.body.pc_avg_rate;
-	user_coll = req.body.user_coll;
-	my_avg_rate = req.body.my_avg_rate;
-	pet_coll = req.body.pet_coll;
-	allocate_unsuccessful = false;
+	readInput(req);
 	redirectHere(res);
 });
 
