@@ -72,7 +72,7 @@
     <h1><%= title%></h1>
 	<p><b>Start date: </b><%= s_date%><span style="padding-left: 30px"></span><b>End date: </b><%= e_date%></p>
 	<button class="btn btn-secondary" type="button" id="edit-btn" onclick="toggleEdit()">Edit request</button>
-	<button class="btn btn-secondary" form="html_form" style="display: none" type="submit" id="save-edit">Save changes</button>
+	<button class="btn btn-secondary" form="html_form" style="display: none" type="submit" id="save-edit" formaction="<%=s_date%>/edit">Save changes</button>
 	<button class="btn btn-secondary" form="html_form" formaction="<%=s_date%>/delete">Delete request</button>
 	<button class="btn btn-secondary" form="html_form" formaction="<%=s_date%>/back">Back</button>
 	<br /><br />

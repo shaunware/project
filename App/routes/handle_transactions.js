@@ -345,5 +345,13 @@ router.post('/:userid/:petid/:s_date/show_filtered', function(req, res, next) {
 	redirectHere(res);
 });
 
+router.post('/:userid/:petid/:s_date/edit', function(req, res, next) {
+	readInput(req);
+	transfer_type = req.body.transfer;
+	payment_method = req.body.payment;
+	console.log(transfer_type);
+	console.log(payment_method);
+});
+
 module.exports = router;
 
