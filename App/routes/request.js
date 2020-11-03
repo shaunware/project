@@ -26,7 +26,8 @@ var renderRequest = (res) => {
 		s_date: getString(s_date),
 		e_date: getString(request.e_date),
 		pet: pet,
-		request: request
+		request: request,
+		caretakers: caretakers
 	})
 }
 
@@ -46,7 +47,14 @@ WHERE pet_id=$1 AND s_date=$2 AND status='Confirmed'
  */
 var save_rate_query = 'UPDATE Transactions SET rate=$1 WHERE pet_id=$2 AND s_date=$3 AND status=\'Confirmed\'';
 var save_review_query = 'UPDATE Transactions SET review=$1 WHERE pet_id=$2 AND s_date=$3 AND status=\'Confirmed\'';
-
+var all_ct_query = 'SELECT T.ct_id AS ct_id, U.name AS name, T.status AS status\n' +
+	'FROM Transactions T INNER JOIN Users U ON U.userid=T.ct_id\n' +
+	'WHERE T.pet_id=$1 AND T.s_date=$2';
+/*
+SELECT T.ct_id AS ct_id, U.name AS name, T.status AS status
+FROM Transactions T INNER JOIN Users U ON U.userid=T.ct_id
+WHERE T.pet_id=$1 AND T.s_date=$2
+ */
 
 /* Data */
 var userid;
@@ -55,6 +63,7 @@ var s_date;
 var pet;
 var transaction;
 var request;
+var caretakers;
 
 /* Err msg */
 
@@ -80,7 +89,10 @@ router.get('/:userid/:petid/:s_date', function(req, res, next) {
 										renderTransaction(res);
 									} else {
 										transaction = null;
-										renderRequest(res);
+										pool.query(all_ct_query, [petid, getString(s_date)], (err, data) => {
+											caretakers = data.rows;
+											renderRequest(res);
+										});
 									}
 								})
 							} else {

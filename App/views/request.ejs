@@ -43,5 +43,28 @@
 			<b>Payment method: </b><%=request.payment_type%>
 		</p>
 	</div>
+    <div id="existing-transactions-info">
+		<table class="table">
+			<thead>
+				<tr><th colspan="4">All transactions you have sent</th></tr>
+				<tr>
+					<th scope="col">Care taker ID</th>
+					<th scope="col">Care taker name</th>
+					<th scope="col">Status</th>
+					<th scope="col"><!-- View --></th>
+				</tr>
+			</thead>
+			<tbody>
+				<% for (var i=0; i<caretakers.length; i++) { %>
+					<tr>
+						<td><%=caretakers[i].ct_id%></td>
+						<td><%=caretakers[i].name%></td>
+						<td><%=caretakers[i].status%></td>
+						<td><a href="../../../test" target="_blank"><button type="button" class="btn btn-secondary">View profile</button></a></td> <!-- TODO: Change to actual view path -->
+					</tr>
+				<% } %>
+			</tbody>
+		</table>
+	</div>
   </body>
 </html>
