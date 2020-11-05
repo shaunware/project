@@ -29,6 +29,7 @@ var requestRouter = require('./routes/request');
 /* --- Pet  -------------- */
 var petRouter = require('./routes/pet');
 var petsRouter = require('./routes/pets');
+var editPetRouter = require('./routes/edit_pet_profile');
 
 var app = express();
 
@@ -67,6 +68,7 @@ app.use('/request', requestRouter);
 /* --- Pet  -------------- */
 app.use('/pet', petRouter);
 app.use('/pets', petsRouter);
+app.use('/edit_pet_profile', editPetRouter);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

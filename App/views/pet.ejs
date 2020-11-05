@@ -15,16 +15,75 @@
 
   </head>
   <body>
-    <h1> 's Page </h1>
+    <h1> Pet Page </h1>
 	<form id="html_form"  role="form" method="post" >
-		<div class="form-group">
-			<label for="petid">Pet Profile</label>
-			<input type="text" class="form-control"
-				   id="petid" name="petid" aria-describedby="petidHelp"
-				   placeholder=""  >
-
+		<div>
+			<table border="1px">
+				<thead>
+				<tr>
+					<th scope="col"> Pet ID</th>
+				</tr>
+				</thead>
+				<tbody>
+				<% for(var i=0; i<pet.length ; i++) { %>
+					<tr>
+						<td><%= pet[i].petid%></td>
+					</tr>
+					<% } %>
+				</tbody>
+			</table>
 		</div>
 
+		<div>
+			<table border="1px">
+				<thead>
+				<tr>
+					<th scope="col"> Pet Name</th>
+				</tr>
+				</thead>
+				<tbody>
+				<% for(var i=0; i<pet.length ; i++) { %>
+					<tr>
+						<td><%= pet[i].name%></td>
+					</tr>
+					<% } %>
+				</tbody>
+			</table>
+		</div>
+
+		<div>
+			<table border="1px">
+				<thead>
+				<tr>
+					<th scope="col"> Pet Category</th>
+				</tr>
+				</thead>
+				<tbody>
+				<% for(var i=0; i<pet.length ; i++) { %>
+					<tr>
+						<td><%= pet[i].category%></td>
+					</tr>
+					<% } %>
+				</tbody>
+			</table>
+		</div>
+
+		<div>
+			<table border="1px">
+				<thead>
+				<tr>
+					<th scope="col"> Requirements</th>
+				</tr>
+				</thead>
+				<tbody>
+				<% for(var i=0; i<pet.length ; i++) { %>
+					<tr>
+						<td><%= pet[i].requirements%></td>
+					</tr>
+					<% } %>
+				</tbody>
+			</table>
+		</div>
 		<a href="../../../test"><button class="btn btn-primary">Edit Pet Profile</button></a> <!-- TODO: set to edit pet profile -->
 		<a href="../../../test"><button class="btn btn-secondary">Back to pets</button></a> <!--TODO: set to pets page -->
 

@@ -14,14 +14,11 @@ var all_categories_query = 'SELECT * FROM PetCategories ORDER BY name';
 var category_exist_query = 'SELECT 1 FROM PetCategories WHERE name=$1';
 var insert_category_query = 'INSERT INTO PetCategories VALUES ';
 var insert_pet_query = 'INSERT INTO Pets VALUES ';
+var select_pet_query = 'SELECT * FROM Pets WHERE petid=$1';
 
 /* Data */
 var userid;
-var petOwners;
-var pets;
-var categories;
-var petid;
-var transactions;
+var pet;
 
 /* Err msg */
 var connectionSuccess;
@@ -41,27 +38,21 @@ router.get('/:userid', function(req, res, next) {
 		}
 	});
 	userid = req.params.userid; //TODO: Need to replace with user session id
+	petid = 'pet7';  //TODO: replace with petid!
 	if (connectionSuccess) {
 		pool.query(petowner_exist_query, [userid], (err, data) => {
 			isPetOwner = data.rows.length > 0;
 		});
 		if (isPetOwner) {
-			pool.query(all_pets_query, (err, data) => {
-				pets = data.rows;
+			pool.query(select_pet_query,[petid], (err, data) => {
+				pet = data.rows;
 			});
 			pool.query(all_categories_query, (err, data) => {
 				categories = data.rows;
 			});
 			res.render('pet', {
 				title: 'Get Pet',
-				categories: categories,
-				petid: "",
-				petidErr: "",
-				name: "",
-				nameErr: "",
-				category: "",
-				categoryErr: "",
-				requirements: "",
+				pet: pet,
 				userid: req.params.userid
 			});
 		} else {
@@ -72,6 +63,7 @@ router.get('/:userid', function(req, res, next) {
 	}
 });
 
+/*
 // POST
 router.post('/:userid', function(req, res, next) {
 	// Retrieve Information
@@ -161,5 +153,5 @@ router.post('/:userid', function(req, res, next) {
 		});
 	}
 });
-
+*/
 module.exports = router;

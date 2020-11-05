@@ -33,12 +33,6 @@
         <tr>
             <th scope="col"> Pet Name</th>
             <th scope="col"> Category</th>
-            <a href="../../../test">
-                <button class="btn btn-primary"> Find a caretaker</button> <!-- TODO link to find CT-->
-            </a>
-            <a href="../../../test">
-                <button class="btn btn-secondary"> Edit pet details</button> <!-- TODO link to edit pet -->
-            </a>
 
         </tr>
         </thead>
@@ -47,7 +41,17 @@
         <tr>
             <td><%= pets[i].name%></td>
             <td><%= pets[i].category%></td>
+            <td> <a href="../../../test">
+                <button class="btn btn-primary"> Find a caretaker</button> <!-- TODO link to find CT-->
+            <td> <a href="../../../test">
+            <button class="btn btn-secondary"> Edit pet details</button> <!-- TODO link to edit pet -->
+            <td>
+                <button type = "submit" button class="btn btn-danger" method="/delete"> Delete pet</button> <!-- TODO link to delete pet -->
+                <!-- TODO THIS DOESNT WORK!!! -->
 
+        </td>
+            </a>
+            </td>
         </tr>
         <% } %>
 

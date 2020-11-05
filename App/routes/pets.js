@@ -12,16 +12,14 @@ var all_pets_query = 'SELECT petid FROM Pets';
 var pet_exist_query = 'SELECT 1 FROM Pets WHERE petid=$1';
 var all_categories_query = 'SELECT * FROM PetCategories ORDER BY name';
 var category_exist_query = 'SELECT 1 FROM PetCategories WHERE name=$1';
-var insert_category_query = 'INSERT INTO PetCategories VALUES ';
-var insert_pet_query = 'INSERT INTO Pets VALUES ';
+var delete_pet_query = 'DELETE FROM Pets WHERE petid=$1 AND userid=$2 ';
 
 var owners_pets = 'SELECT * FROM Pets';
 
 /* Data */
 var userid;
-//var petOwners;
 var pets;
-//var categories;
+
 
 /* Err msg */
 var connectionSuccess;
@@ -54,16 +52,8 @@ router.get('/:userid', function(req, res, next) {
 			});
 			res.render('pets', {
 				title: 'Pets',
-				categories: categories,
-				petid: "",
-				petidErr: "",
-				pets: pets,
-				name: "",
-				nameErr: "",
-				category: "",
-				categoryErr: "",
-				requirements: "",
-				userid: req.params.userid
+				userid: req.params.userid,
+				pets: pets
 			});
 		} else {
 			res.render('not_found_error', {component: 'userid'});
@@ -73,4 +63,25 @@ router.get('/:userid', function(req, res, next) {
 	}
 });
 
+//DELETE
+router.post('/:userid', function(req, res, next) {
+	// Retrieve Information
+	var petid  = req.body.petid.toLowerCase().trim();
+	var owner = req.params.userid; //TODO: Need to replace with user session id
+
+	// Construct Specific SQL Query
+	//var delete_pet_query = insert_pet_query + "('" + petid + "','" + name + "','" + category + "','" + owner + "','" + requirements + "')";
+
+	pool.query(delete_pet_query, [petid, owner], (err, data) => {
+			console.log(" Deleted " + owner + "'s pet " + petid);
+			res.redirect('/test'); //TODO: Need to update to pet view page
+		});
+
+		res.render('pet', {
+			title: 'Pets',
+            userid: req.params.userid,
+            pets: pets
+		});
+
+});
 module.exports = router;
